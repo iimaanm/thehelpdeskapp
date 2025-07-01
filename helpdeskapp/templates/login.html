@@ -1,20 +1,9 @@
 {% extends "base.html" %} {% block title %}Login{% endblock%}
-<!-- overwriting any blocks in base.html -->
-
+<!-- overwrites any blocks in base.html -->
 
 {% block content %}
 <form method="POST">
-    <h3 align="center">Log in to the Help Desk App</h3>
-    
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <ul class="flashes">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-{% endwith %}
+  <h3 align="center">Log in to the Help Desk App</h3>
 
   <div class="form-group">
     <label for="username">User Name</label>
@@ -33,7 +22,7 @@
       type="password"
       class="form-control"
       id="passwordLogin"
-      name="passwordLogin"
+      name="password"
       placeholder="Enter password"
       required
     />
@@ -41,4 +30,4 @@
   <br />
   <button type="submit" class="btn btn-primary">Log in</button>
 </form>
-  {% endblock %}
+{% endblock %}

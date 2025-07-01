@@ -6,23 +6,14 @@
   <br />
   <h3 align="center">Sign up for the Help Desk App</h3>
 
-  {% with messages = get_flashed_messages() %} {% if messages %}
-  <ul class="flashes">
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %} {% endwith %}
-
   <div class="form-group">
     <label for="username">User Name</label>
     <input
       type="text"
       class="form-control"
       id="username"
-      name="username"
+      name="username  "
       placeholder="Enter a user name"
-      required
     />
   </div>
   <div class="form-group">
@@ -33,7 +24,6 @@
       id="firstName"
       name="firstName"
       placeholder="Enter your first name"
-      required
     />
   </div>
   <div class="form-group">
@@ -44,7 +34,6 @@
       id="password"
       name="password"
       placeholder="Enter a password"
-      required
     />
   </div>
   <div class="form-group">
@@ -55,14 +44,13 @@
       id="passwordConfirm"
       name="passwordConfirm"
       placeholder="Confirm password"
-      required
     />
   </div>
 
   <div class="form-group">
     <label for="role">Role</label>
-    <select class="custom-select" name="role" id="role" required>
-      <option selected>Select a Role</option>
+    <select class="custom-select" name="role" id="role">
+      <option value="" selected disabled>Select a Role</option>
       <option value="user">User</option>
       <option value="Admin">Admin</option>
     </select>
@@ -70,7 +58,7 @@
   
   <div class="form-group">
     <label for="departmentId">Department ID (optional)</label>
-    <select class="custom-select" name="departmentId" id="departmentId" required>
+    <select class="custom-select" name="departmentId" id="departmentId">
       <option selected>Select a Department Id</option>
       <option value="consulting">Consulting</option>
       <option value="business">Business</option>
