@@ -1,14 +1,33 @@
 {% extends "base.html" %} {% block title %}Login{% endblock%}
-<!-- overwriting any blocks in base.html -->
+<!-- overwrites any blocks in base.html -->
 
-      {% block content %}
-<h1> This is the login page</h1>     
-{% if boolean == True %}
+{% block content %}
+<form method="POST">
+  <h3 align="center">Log in to the Help Desk App</h3>
 
-True
-
-{% else %}
-False
-{% endif %}
+  <div class="form-group">
+    <label for="username">User Name</label>
+    <input
+      type="text"
+      class="form-control"
+      id="username"
+      name="username"
+      placeholder="Enter user name"
+      required
+    />
+  </div>
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input
+      type="password"
+      class="form-control"
+      id="passwordLogin"
+      name="password"
+      placeholder="Enter password"
+      required
+    />
+  </div>
+  <br />
+  <button type="submit" class="btn btn-primary">Log in</button>
+</form>
 {% endblock %}
-   
