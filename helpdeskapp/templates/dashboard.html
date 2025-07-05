@@ -1,90 +1,83 @@
-{% extends "base.html" %} {% block title %}Dashboard{% endblock%}
-<!-- overwriting any blocks in base.html -->
-
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
 
 {% block content %}
-    <h3 align="center">Welcome to your Dashboard</h3>
-
-    {% if current_user.is_admin %}
-      <h5>All Tickets (Admin View)</h5>
-      <table class="table table-bordered">
+<div class="container mt-4">
+    <h2>Ticket Dashboard</h2>
+    <table class="table table-striped">
         <thead>
-          <tr>
-            <th>User</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Actions</th>
-          </tr>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                {% if current_user.role == "Admin" %}
+                    <th>Created By</th>
+                    <th>User ID</th>
+                {% endif %}
+                <th>Date Created</th>
+                <th>Status</th>
+                {% if current_user.role == "Admin" %}
+                    <th>Priority</th>
+                {% endif %}
+                <th>Actions</th>
+            </tr>
         </thead>
         <tbody>
-          {% for ticket in all_tickets %}
+            {% for ticket in tickets %}
             <tr>
-              <td>{{ ticket.user.username }}</td>
-              <td>{{ ticket.title }}</td>
-              <td>{{ ticket.description }}</td>
-              <td>
-                <!-- <a href="{{ url_for('update_ticket', ticket_id=ticket.id) }}" class="btn btn-primary btn-sm">Update</a> -->
-                <button type="button" class="btn btn-danger btn-sm" onclick="deleteTicket({{ ticket.id }})">Delete</button>
-              </td>
+                <td>{{ ticket.title }}</td>
+                <td>{{ ticket.description }}</td>
+                {% if current_user.role == "Admin" %}
+                    <td>{{ ticket.user.first_name }}</td>
+                    <td>{{ ticket.user.id }}</td>
+                {% endif %}
+                <td>{{ ticket.date.strftime('%d-%m-%Y %H:%M') }}</td>
+                 {% if current_user.role == "Admin" %}
+                    <td>{{ ticket.priority }}</td>
+                {% endif %}
+                <td>{{ ticket.status }}</td>
+                <td>
+                    <a href="{{ url_for('views.edit_ticket', ticket_id=ticket.id) }}" 
+                       class="btn btn-warning btn-sm">
+                       <i class="fa fa-edit"></i> Edit
+                    </a>
+                    {% if current_user.role == "Admin" %}
+                        <button onclick="deleteTicket({{ ticket.id }})" 
+                                class="btn btn-danger btn-sm">
+                                <i class="fa fa-trash"></i> Delete
+                        </button>
+                    {% endif %}
+                </td>
             </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <h5>Your Tickets</h5>
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for ticket in user.tickets %}
-            <tr>
-              <td>{{ ticket.title }}</td>
-              <td>{{ ticket.description }}</td>
-              <td>
-                <!-- <a href="{{ url_for('update_ticket', ticket_id=ticket.id) }}" class="btn btn-primary btn-sm">Update</a> -->
-              </td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% endif %}
-    <script>
-    function deleteTicket(ticketId) {
-      if (confirm('Are you sure you want to delete this ticket?')) {
-        fetch(`/delete_ticket/${ticketId}`, {method: 'POST'})
-          .then(response => {
-            if (response.ok) {
-              location.reload();
-            }
-          });
-      }
-    }
-    </script>
-<!-- <ul class="list-group-flush" id="tickets">
-<table class="table table-striped">
-      <thead>
-            <tr>
-                  <th>Title</th>
-                  <th>Description</th>
-                  <th>Action</th>
-                  
-            </tr>
-      </thead>
-      <tbody>
-            {% for ticket in user.tickets %}
-                  <tr>
-                        <td><strong>{{ ticket.title }}</strong></td>
-                        <td>{{ ticket.description }}</td>
-                        <td>
-                              <button type="button" class="btn btn-danger btn-sm" onclick="deleteTicket({{ ticket.id }})">Delete</button>
-                        </td>
-                  </tr>
             {% endfor %}
-      </tbody>
-</table> -->
+        </tbody>
+    </table>
+
+    {% if current_user.role == "Admin" %}
+        <div class="mt-3">
+            <a href="{{ url_for('views.new_ticket') }}" class="btn btn-primary">
+                <i class="fa fa-plus"></i> Create New Ticket
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function deleteTicket(ticketId) {
+    if (confirm('Are you sure you want to delete this ticket?')) {
+        fetch('/delete-ticket', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ ticketId: ticketId })
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Error deleting ticket');
+            }
+        });
+    }
+}
+</script>
 {% endblock %}
