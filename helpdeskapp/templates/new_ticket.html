@@ -8,7 +8,6 @@
             <tr>
                   <th>Title</th>
                   <th>Description</th>
-                  {% if current_user.role == 'admin' %}<th>Action</th> {% endif %}
             </tr>
       </thead>
       <tbody>
@@ -16,15 +15,13 @@
                   <tr>
                         <td><strong>{{ ticket.title }}</strong></td>
                         <td>{{ ticket.description }}</td>
-            {% if current_user.role == 'admin' %}
-                        <td>
-                              <button type="button" class="btn btn-danger btn-sm" onclick="deleteTicket({{ ticket.id }})">Delete</button>
-                        </td>
-            {% endif %}
                   </tr>
             {% endfor %}
       </tbody>
 </table>
+<br/>
+<br/>
+<br/>
 </ul>
   <form method="POST">
       <textarea name="title" class="form-control" id="title" placeholder="Title" maxlength="100"></textarea>
@@ -42,3 +39,23 @@
       <a href="/dashboard" class="btn btn-secondary">Go to Dashboard</a>
 </div>
 {% endblock %}
+
+<script>
+// Warning user if they try to leave the page with unsaved changes in the ticket form modal
+let formChanged = false;
+const form = document.getElementById('ticketForm');
+if (form) {
+    form.addEventListener('input', () => {
+        formChanged = true;
+    });
+    window.addEventListener('beforeunload', function (e) {
+        if (formChanged) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+    form.addEventListener('submit', () => {
+        formChanged = false;
+    });
+}
+</script>

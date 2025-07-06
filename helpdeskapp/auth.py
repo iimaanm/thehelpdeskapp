@@ -39,8 +39,6 @@ def signup():
         passwordConfirm = request.form.get('passwordConfirm')
         role = str(request.form.get('role')).strip()
         departmentId = str(request.form.get('departmentId')).strip()
-        # Print for debugging (remove in production)
-        print(f"Username: {username}, Role: {role}, Department ID: {departmentId}")
         # Form validation
         user = User.query.filter_by(username=username).first()
         if user:

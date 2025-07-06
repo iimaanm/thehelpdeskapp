@@ -10,7 +10,7 @@ views = Blueprint('views', __name__)
 @views.route('/', methods=['GET', 'POST'])
 @login_required
 def home():
-    # Home page: handles ticket creation via modal form
+    # Home page: introduces user to the app and handles ticket creation via modal form
     if request.method == 'POST':
         success, message = create_ticket_from_form(request)
         category = 'success' if success else 'danger'
@@ -94,6 +94,8 @@ def delete_ticket():
     if ticket and (ticket.user_id == current_user.id or current_user.role == "Admin"):
         db.session.delete(ticket)
         db.session.commit()
+        flash('Ticket deleted successfully', 'success')
         return jsonify({'message': 'Ticket deleted successfully'}), 200
     else:
-        return jsonify({'message': 'Ticket not found'}), 404
+        flash('Ticket not found or you do not have permission to delete this ticket', 'danger')
+        return jsonify({'message': 'Ticket not found or you do not have permission to delete this ticket'}), 404
