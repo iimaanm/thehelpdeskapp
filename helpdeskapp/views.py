@@ -11,7 +11,6 @@ views = Blueprint('views', __name__)
 @login_required
 def home():
     # Home page: introduces user to the app and handles ticket creation via modal form
-    print(current_user.department_id)
     if request.method == 'POST':
         success, message = create_ticket_from_form(request)
         category = 'success' if success else 'danger'
