@@ -1,6 +1,7 @@
 {% extends "base.html" %} {% block title %}Home{% endblock%}
 
 {% block content %}
+<!-- New Ticket page: Allows users to submit a new ticket and view their tickets -->
 <h1 align="center">Submit a New Ticket</h1>
 <ul class="list-group-flush" id="tickets">
 <table class="table table-striped">
@@ -23,6 +24,7 @@
 <br/>
 <br/>
 </ul>
+<!-- Ticket creation form -->
   <form method="POST">
       <textarea name="title" class="form-control" id="title" placeholder="Title" maxlength="100"></textarea>
       <br/>
@@ -34,28 +36,9 @@
   </form>
 </ul>
 </form>
-
+<!-- Link to dashboard -->
 <div align="center" style="margin-top: 20px;">
       <a href="/dashboard" class="btn btn-secondary">Go to Dashboard</a>
 </div>
 {% endblock %}
 
-<script>
-// Warning user if they try to leave the page with unsaved changes in the ticket form modal
-let formChanged = false;
-const form = document.getElementById('ticketForm');
-if (form) {
-    form.addEventListener('input', () => {
-        formChanged = true;
-    });
-    window.addEventListener('beforeunload', function (e) {
-        if (formChanged) {
-            e.preventDefault();
-            e.returnValue = '';
-        }
-    });
-    form.addEventListener('submit', () => {
-        formChanged = false;
-    });
-}
-</script>

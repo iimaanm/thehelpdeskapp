@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
-from flask_login import login_user, logout_user, login_required, current_user
-from .models import User, Ticket
+from flask_login import login_required, current_user
+from .models import Ticket
 from . import db
 import json
 
@@ -11,6 +11,7 @@ views = Blueprint('views', __name__)
 @login_required
 def home():
     # Home page: introduces user to the app and handles ticket creation via modal form
+    print(current_user.department_id)
     if request.method == 'POST':
         success, message = create_ticket_from_form(request)
         category = 'success' if success else 'danger'
@@ -20,7 +21,7 @@ def home():
 @views.route('/new_ticket', methods=['GET', 'POST'])
 @login_required
 def new_ticket():
-    # Page to create a new ticket
+    # New ticket page for creating a new ticket
     if request.method == 'POST':
         success, message = create_ticket_from_form(request)
         category = 'success' if success else 'danger'
@@ -30,7 +31,7 @@ def new_ticket():
 @views.route('/dashboard')
 @login_required
 def dashboard():
-    # Dashboard: Admin sees all tickets, users see their own
+    # Dashboard: Admins see all tickets, users can only see their own
     if current_user.role == "Admin":
         tickets = Ticket.query.order_by(Ticket.date.desc()).all()
     else:
@@ -40,12 +41,12 @@ def dashboard():
 @views.route('/edit-ticket/<int:ticket_id>', methods=['GET', 'POST'])
 @login_required
 def edit_ticket(ticket_id):
-    # Edit ticket: Only Admin or ticket owner can edit
+    # Edit ticket: Only Admin or the ticket owner can edit
     ticket = Ticket.query.get_or_404(ticket_id)
     if current_user.role != "Admin" and ticket.user_id != current_user.id:
         flash("You don't have permission to edit this ticket", "danger")
         return redirect(url_for('views.dashboard'))
-    # Update ticket fields
+    # Updating ticket fields
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
@@ -71,6 +72,7 @@ def create_ticket_from_form(request):
     # Helper function to validate and create a new ticket from form data
     title = request.form.get('title')
     ticket_description = request.form.get('ticket')
+    # Form validation
     if len(title) < 5:
         return False, 'Ticket title must be at least 5 characters long'
     elif len(ticket_description) < 5:
@@ -87,7 +89,7 @@ def create_ticket_from_form(request):
 @views.route('/delete-ticket', methods=['POST'])
 @login_required
 def delete_ticket():
-    # Delete ticket: User - only ticket owner can delete, Admin - can delete any ticket
+    # Delete ticket: User - only ticket owner can delete. Admin - can delete any ticket.
     ticket = json.loads(request.data)
     ticketId = ticket['ticketId']
     ticket = Ticket.query.get(ticketId)

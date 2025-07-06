@@ -1,10 +1,11 @@
 {% extends "base.html" %} {% block title %}Sign up{% endblock%}
 
 {% block content %}
+<!-- Signup page: User registration form -->
 <form method="POST">
   <br />
   <h3 align="center">Sign up for the Help Desk App</h3>
-
+  <!-- Username field -->
   <div class="form-group">
     <label for="username">User Name</label>
     <input
@@ -15,6 +16,7 @@
       placeholder="Enter a user name"
     />
   </div>
+  <!-- First name field -->
   <div class="form-group">
     <label for="first_name">First Name</label>
     <input
@@ -25,6 +27,7 @@
       placeholder="Enter your first name"
     />
   </div>
+  <!-- Password fields -->
   <div class="form-group">
     <label for="password">Password</label>
     <input
@@ -45,34 +48,34 @@
       placeholder="Confirm password"
     />
   </div>
-
+  <!-- Role selection -->
   <div class="form-group">
     <label for="role">Role</label>
     <select class="custom-select" name="role" id="role">
       <option value="" selected disabled>Select a Role</option>
-      <option value="user">User</option>
+      <option value="User">User</option>
       <option value="Admin">Admin</option>
     </select>
   </div>
-  
+  <!-- Department selection -->
   <div class="form-group">
-    <label for="departmentId">Department ID (optional)</label>
-    <select class="custom-select" name="departmentId" id="departmentId">
+    <label for="department_id">Department ID (optional)</label>
+    <select class="custom-select" name="department_id" id="department_id">
       <option value="" selected disabled>Select a Department Id</option>
-      <option value="consulting">Consulting</option>
-      <option value="business">Business</option>
-      <option value="hr">HR</option>
-      <option value="finance">Finance</option>
-      <option value="marketing">Marketing</option>
-      <option value="facilities">Facilities</option>
-      <option value="resourcing">Resourcing</option>
+      <option value="Consulting">Consulting</option>
+      <option value="Business">Business</option>
+      <option value="HR">HR</option>
+      <option value="Finance">Finance</option>
+      <option value="Marketing">Marketing</option>
+      <option value="Facilities">Facilities</option>
+      <option value="Resourcing">Resourcing</option>
     </select>
   </div>
-
   <br />
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
 <br /><br /><br />
+<!-- Link to login page for existing users -->
 <button>
   <a href="{{ url_for('auth.login') }}">Already have an account? Login here</a>
 </button>

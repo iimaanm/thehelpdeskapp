@@ -2,7 +2,9 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
+<!-- Home page: Welcome message, quick links and ticket modal -->
 <div class="container py-5">
+    <!-- Jumbotron for welcome message and app summary -->
     <div class="jumbotron text-center bg-light p-5 rounded">
         <h1 class="display-4">Welcome to the Helpdesk</h1>
         <p class="lead">A simple and efficient way to manage support tickets</p>
@@ -13,7 +15,6 @@
             <p>Submit and track your support tickets easily.</p>
         {% endif %}
     </div>
-
     <div class="row mt-5">
         <div class="col-md-4">
             <div class="card h-100">
@@ -25,20 +26,19 @@
                 </div>
             </div>
         </div>
-
         <div class="col-md-4">
             <div class="card h-100">
                 <div class="card-body text-center">
                     <i class="fa fa-plus-circle fa-3x mb-3 text-success"></i>
                     <h5 class="card-title">New Ticket</h5>
                     <p class="card-text">Create a new support ticket for assistance.</p>
+                    <!-- Button to open the ticket modal -->
                     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newTicketModal">
                         Create Ticket
                     </button>
                 </div>
             </div>
         </div>
-
         <div class="col-md-4">
             <div class="card h-100">
                 <div class="card-body text-center">
@@ -46,13 +46,15 @@
                     <h5 class="card-title">Quick Guide</h5>
                     <p class="card-text">
                         {% if current_user.role == "Admin" %}
-                            • View all tickets<br>
-                            • Manage user requests<br>
-                            • Full CRUD operations
+                            <!-- Admin guide -->
+                            &bull; View all tickets<br>
+                            &bull; Manage user requests<br>
+                            &bull; Full CRUD operations
                         {% else %}
-                            • Create new tickets<br>
-                            • Track your tickets<br>
-                            • Update existing tickets
+                            <!-- User guide -->
+                            &bull; Create new tickets<br>
+                            &bull; Track your tickets<br>
+                            &bull; Update existing tickets
                         {% endif %}
                     </p>
                 </div>
@@ -60,8 +62,7 @@
         </div>
     </div>
 </div>
-
-<!-- New Ticket Modal -->
+<!-- Ticket creation modal (shown when 'Create Ticket' is clicked) -->
 <div class="modal fade" id="newTicketModal" tabindex="-1" role="dialog" aria-labelledby="newTicketModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -72,6 +73,7 @@
                 </button>
             </div>
             <div class="modal-body">
+                <!-- New Ticket form -->
                 <form method="POST" id="ticketForm">
                     <div class="form-group">
                         <label for="title">Title</label>

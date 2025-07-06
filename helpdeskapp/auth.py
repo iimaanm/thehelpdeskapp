@@ -38,7 +38,7 @@ def signup():
         password = request.form.get('password')
         passwordConfirm = request.form.get('passwordConfirm')
         role = str(request.form.get('role')).strip()
-        departmentId = str(request.form.get('departmentId')).strip()
+        department_id = str(request.form.get('department_id')).strip()
         # Form validation
         user = User.query.filter_by(username=username).first()
         if user:
@@ -58,8 +58,8 @@ def signup():
         elif role == "None":
             flash('Role is required', category='danger')
         else:
-            # Create new user and add to database
-            new_user = User(username=username, first_name=first_name, password=generate_password_hash(password), role=role, department_id=departmentId)
+            # Creates new user and adds to database
+            new_user = User(username=username, first_name=first_name, password=generate_password_hash(password), role=role, department_id=department_id)
             db.session.add(new_user)
             db.session.commit()
             login_user(new_user, remember=True)

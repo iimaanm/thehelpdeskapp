@@ -40,5 +40,5 @@ def create_app():
 def create_database(app):
     if not path.exists('helpdeskapp/' + DB_NAME):
         with app.app_context():
-            db.create_all()  # Create all tables defined in models
+            db.create_all()  # Creates all tables defined in models
     print("Created new database")
