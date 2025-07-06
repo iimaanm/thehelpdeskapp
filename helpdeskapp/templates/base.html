@@ -15,10 +15,10 @@
       crossorigin="anonymous"
     />
 
-    <!-- Block is replacable by other templates -->
     <title>{% block title %}Home{% endblock %}</title>
   </head>
   <body>
+    <!-- Navigation bar with links based on authentication and role -->
     <nav class="navbar navbar-dark bg-dark">
       <div class="navbar-nav d-flex flex-row align-items-center">
         {% if current_user.is_authenticated %}
@@ -27,21 +27,23 @@
           <a class="nav-item nav-link mx-2" id="new_ticket" href="/new_ticket">New Ticket</a>
           <a class="nav-item nav-link mx-2" id="logout" href="/logout">Logout</a>
           </div>
+          <!-- Displaying user role and department in Nav bar-->
           <span class="navbar-text ml-auto mr-3 badge badge-info">
             {% if current_user.role == "Admin" %}
               Admin
             {% else %}
               User
-            {% endif %}
+            {% endif %}          
           </span>
+          <span class="badge badge-info">{{ current_user.department_id if current_user.department_id != "None" else "" }}</span>
         {% else %}
-          <a class="nav-item nav-link mx-2" id="register" href="/signup">Sign up</a>
-          <a class="nav-item nav-link mx-2" id="login" href="/login">Login</a>
           <a class="nav-item nav-link mx-2" id="signup" href="/signup">Sign Up</a>
+          <a class="nav-item nav-link mx-2" id="login" href="/login">Login</a>
         {% endif %}
       </div>
     </nav>
-                  
+    
+    <!-- Flash messages for user feedback -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}

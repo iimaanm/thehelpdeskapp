@@ -1,4 +1,4 @@
-// // Function takes ticket id and sends a post request to the 'delete-ticket' endpoint to delete the ticket
+// Function takes ticket id and sends a post request to the 'delete-ticket' endpoint to delete the ticket
 function deleteTicket(ticketId) {
     if (confirm('Are you sure you want to delete this ticket?')) {
         fetch('/delete-ticket', {
