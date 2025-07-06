@@ -1,43 +1,93 @@
-{% extends "base.html" %} {% block title %}Home{% endblock%}
-<!-- overwriting any blocks in base.html -->
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
-<h1 align="center">Submit a Ticket</h1>
-<ul class="list-group-flush" id="tickets">
-<table class="table table-striped">
-      <thead>
-            <tr>
-                  <th>Title</th>
-                  <th>Description</th>
-                  <th>Action</th>
-            </tr>
-      </thead>
-      <tbody>
-            {% for ticket in user.tickets %}
-                  <tr>
-                        <td><strong>{{ ticket.title }}</strong></td>
-                        <td>{{ ticket.description }}</td>
-                        <td>
-                              <button type="button" class="btn btn-danger btn-sm" onclick="deleteTicket({{ ticket.id }})">Delete</button>
-                        </td>
-                  </tr>
-            {% endfor %}
-      </tbody>
-</table>
-</ul>
-  <form method="POST">
-      <textarea name="title" class="form-control" id="title" placeholder="Title" maxlength="100"></textarea>
-      <br/>
-      <textarea name="ticket" class="form-control" id="ticket" placeholder="Describe your issue"></textarea>
-    <br/>
-    <div align="center">
-      <button type="submit" class="btn btn-primary">Add Ticket</button>
+<div class="container py-5">
+    <div class="jumbotron text-center bg-light p-5 rounded">
+        <h1 class="display-4">Welcome to the Helpdesk</h1>
+        <p class="lead">A simple and efficient way to manage support tickets</p>
+        <hr class="my-4">
+        {% if current_user.role == "Admin" %}
+            <p>As an admin, you can view all tickets, manage users and perform administrative tasks.</p>
+        {% else %}
+            <p>Submit and track your support tickets easily.</p>
+        {% endif %}
     </div>
-  </form>
-</ul>
-</form>
 
-<div align="center" style="margin-top: 20px;">
-      <a href="/dashboard" class="btn btn-secondary">Go to Dashboard</a>
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fa fa-ticket fa-3x mb-3 text-primary"></i>
+                    <h5 class="card-title">View Tickets</h5>
+                    <p class="card-text">Access and manage your support tickets from one place.</p>
+                    <a href="/dashboard" class="btn btn-primary">Go to Dashboard</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fa fa-plus-circle fa-3x mb-3 text-success"></i>
+                    <h5 class="card-title">New Ticket</h5>
+                    <p class="card-text">Create a new support ticket for assistance.</p>
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newTicketModal">
+                        Create Ticket
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fa fa-question-circle fa-3x mb-3 text-info"></i>
+                    <h5 class="card-title">Quick Guide</h5>
+                    <p class="card-text">
+                        {% if current_user.role == "Admin" %}
+                            • View all tickets<br>
+                            • Manage user requests<br>
+                            • Full CRUD operations
+                        {% else %}
+                            • Create new tickets<br>
+                            • Track your tickets<br>
+                            • Update existing tickets
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Ticket Modal -->
+<div class="modal fade" id="newTicketModal" tabindex="-1" role="dialog" aria-labelledby="newTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newTicketModalLabel">Create New Ticket</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" id="ticketForm">
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="Enter ticket title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ticket">Description</label>
+                        <textarea class="form-control" id="ticket" name="ticket" rows="3" placeholder="Describe your issue" required></textarea>
+                    </div>
+                    <div class="text-right">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Submit Ticket</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -2,30 +2,28 @@ from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 
-#Creating database models for users, admins and tickets
+# User model with role-based access (Admin/User)
 class User(db.Model, UserMixin):
-    #User model with role based access (admin/regular)
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(150), unique=True, nullable=False)
-    first_name = db.Column(db.String(150), nullable=False)
-    password = db.Column(db.String(150), nullable=False)
-    role = db.Column(db.String(150), nullable=False)
-    department_id = db.Column(db.Integer, db.ForeignKey('department.id'), nullable=False)
-    tickets = db.relationship('Ticket', backref='user')
+    username = db.Column(db.String(150), unique=True, nullable=False)  # Unique username
+    first_name = db.Column(db.String(150), nullable=False)  # User's first name
+    password = db.Column(db.String(150), nullable=False)  # Hashed password
+    role = db.Column(db.String(150), nullable=False)  # 'Admin' or 'user'
+    department_id = db.Column(db.Integer, db.ForeignKey('department.id'), nullable=False)  # Foreign key to Department
+    tickets = db.relationship('Ticket', backref='user')  # Relationship to tickets
 
+# Ticket model for user-reported issues
 class Ticket(db.Model):
-    # Ticket model for user reported issues
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(150), nullable=False)
-    description = db.Column(db.Text, nullable=False)
-    date = db.Column(db.DateTime(timezone=True), default=func.now())
-    status = db.Column(db.String(150), nullable=False, default="Open")
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    priority = db.Column(db.String(50), nullable=True, default="Medium")
+    title = db.Column(db.String(150), nullable=False)  # Ticket title
+    description = db.Column(db.Text, nullable=False)  # Ticket description
+    date = db.Column(db.DateTime(timezone=True), default=func.now())  # Date created
+    status = db.Column(db.String(150), nullable=False, default="Open")  # Ticket status
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)  # Foreign key to User
+    priority = db.Column(db.String(50), nullable=True, default="Medium")  # Ticket priority
 
-
+# Department model for organising users and tickets
 class Department(db.Model):
-    # Department model for organising users and tickets
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(150), nullable=False)
-    users = db.relationship('User', backref='department')
+    name = db.Column(db.String(150), nullable=False)  # Department name
+    users = db.relationship('User', backref='department')  # Relationship to users
