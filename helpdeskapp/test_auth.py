@@ -30,7 +30,7 @@ def user(app):
         username="test_helpdesk_user",
         first_name="Test",
         password=generate_password_hash("password123"),
-        role="user",
+        role="User",
         department_id="1"
     )
     db.session.add(user)
