@@ -296,5 +296,105 @@ def test_edit_ticket_validation_short_description(client, user):
         data={"title": "Valid Title", "description": "abc"},
         follow_redirects=True,
     )
-    
     assert b"Description must be at least 5 characters" in response.data
+
+
+def test_guide_topic_user_can_access_user_guides(client, user):
+    """Testing User can only access user-specific guides."""
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(user.id)
+        sess['_fresh'] = True
+    user_topics = ['create-new-tickets', 'track-your-tickets', 'update-existing-tickets']
+    for topic in user_topics:
+        response = client.get(f"/guide/{topic}")
+        assert response.status_code == 200
+
+def test_guide_topic_admin_can_access_admin_guides(client, admin):
+    """Testing Admin can access admin-specific guides."""
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(admin.id)
+        sess['_fresh'] = True
+    
+    admin_topics = ['view-all-tickets', 'manage-user-requests', 'delete-tickets']
+    for topic in admin_topics:
+        response = client.get(f"/guide/{topic}")
+        assert response.status_code == 200
+
+def test_guide_topic_cross_role_access_denied(client, user, admin):
+    """Testing that users cannot access guides outside their role."""
+    # User trying to access admin guides
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(user.id)
+        sess['_fresh'] = True
+    
+    admin_topics = ['view-all-tickets', 'manage-user-requests', 'delete-tickets']
+    for topic in admin_topics:
+        response = client.get(f"/guide/{topic}", follow_redirects=True)
+        assert b"Guide not found" in response.data or response.status_code == 302
+
+def test_guide_topic_both_roles_can_access_create_tickets(client, user, admin):
+    """Testing that both roles can access create-new-tickets guide."""
+    # User
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(user.id)
+        sess['_fresh'] = True
+    
+    response = client.get("/guide/create-new-tickets")
+    assert response.status_code == 200
+    
+    # Admin
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(admin.id)
+        sess['_fresh'] = True
+    
+    response = client.get("/guide/create-new-tickets")
+    assert response.status_code == 200
+
+def test_guide_index_admin_partials(client, admin):
+    """Test that admin sees admin partials on guide index page."""
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(admin.id)
+        sess['_fresh'] = True
+    
+    response = client.get('/guide')
+    assert response.status_code == 200
+    
+    # Check that admin guide content is present
+    assert b'Admin Guides' in response.data
+    assert b'Creating New Tickets' in response.data
+    assert b'Viewing All Tickets' in response.data
+    assert b'Managing and Updating Tickets' in response.data
+    assert b'Deleting Tickets' in response.data
+    
+    # Check that admin guide links are present
+    assert b'/guide/create-new-tickets' in response.data
+    assert b'/guide/view-all-tickets' in response.data
+    assert b'/guide/manage-user-requests' in response.data
+    assert b'/guide/delete-tickets' in response.data
+
+def test_guide_index_user_partials(client, user):
+    """Test that user sees user partials on guide index page."""
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(user.id)
+        sess['_fresh'] = True
+    
+    response = client.get('/guide')
+    assert response.status_code == 200
+    
+    # Check that user guide content is present
+    assert b'User Guides' in response.data or b'Creating New Tickets' in response.data
+
+def test_guide_partials_status_partial(client, user):
+    """Test that status partial renders correctly."""
+    with client.session_transaction() as sess:
+        sess['_user_id'] = str(user.id)
+        sess['_fresh'] = True
+    
+    response = client.get('/guide/manage-user-requests')
+    assert response.status_code == 200
+    
+    # Check that status partial content is present
+    assert b'Understanding Ticket Status' in response.data
+    assert b'badge-primary' in response.data
+    assert b'badge-warning' in response.data
+    assert b'badge-success' in response.data

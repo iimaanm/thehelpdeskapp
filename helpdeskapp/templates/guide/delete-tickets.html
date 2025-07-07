@@ -1,0 +1,134 @@
+{% extends "base.html" %} {% block title %}Guide: Delete Tickets{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item"><a href="/guide">Guide</a></li>
+          <li class="breadcrumb-item active">Delete Tickets</li>
+        </ol>
+      </nav>
+
+      <h1><i class="fa fa-trash text-danger"></i> Delete Tickets</h1>
+      <p class="lead">Learn how to safely delete tickets from the system.</p>
+      <hr />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="guide-content">
+        <div class="alert alert-danger">
+          <i class="fa fa-exclamation-triangle"></i>
+          <strong>Warning:</strong> Ticket deletion is permanent and cannot be
+          undone. Use this feature with caution.
+        </div>
+
+        <h3>When to Delete Tickets</h3>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Acceptable & Unacceptable Reasons for Deletion</h5>
+          </div>
+          <div class="card-body">
+            <p><strong>Delete tickets only in these scenarios:</strong></p>
+            <div class="row">
+              <div class="col-md-6">
+                <h6 class="text-success">✓ Valid Reasons:</h6>
+                <ul class="text-success">
+                  <li>Duplicate tickets</li>
+                  <li>Spam tickets</li>
+                  <li>Test tickets created during system setup</li>
+                  <li>Tickets with personal/sensitive info posted publicly</li>
+                  <li>Tickets created by mistake with no content</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6 class="text-danger">✗ Invalid Reasons:</h6>
+                <ul class="text-danger">
+                  <li>Ticket is old or resolved</li>
+                  <li>User has resolved the issue</li>
+                  <li>Ticket is incomplete</li>
+                  <li>
+                    Ticket is not related to Helpdesk (escalate as needed)
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Deletion Process</h5>
+          </div>
+          <div class="card-body">
+            <p><strong>How to delete a ticket:</strong></p>
+            <ol>
+              <li>
+                <strong>Navigate to the ticket</strong> - Find the ticket in
+                the dashboard
+              </li>
+              <li><strong>Click delete button</strong> - red "Delete" icon</li>
+              <li>
+                <strong>Confirm deletion</strong> - System will ask for
+                confirmation
+              </li>
+              <li>
+                <strong>Verify removal</strong> - Check that ticket is no longer
+                in the dashboard
+              </li>
+            </ol>
+
+            <div class="alert alert-warning">
+              <i class="fa fa-exclamation-triangle"></i>
+              <strong>Double-check:</strong> Make sure you're deleting the
+              correct ticket - the action cannot be undone.
+            </div>
+          </div>
+          <div class="card mb-4">
+            <div class="card-header">
+              <h5>Documentation Before Deletion</h5>
+            </div>
+            <div class="card-body">
+              <p><strong>Always document your deletion:</strong></p>
+              <ol>
+                <li>
+                  <strong>Screenshot the ticket</strong> - Capture ticket
+                  details before deletion
+                </li>
+                <li>
+                  <strong>Record the reason</strong> - Why deletion was
+                  necessary
+                </li>
+                <li>
+                  <strong>Note the date/time</strong> - When deletion occurred
+                </li>
+                <li>
+                  <strong>Identify the admin</strong> - Who performed the
+                  deletion
+                </li>
+              </ol>
+
+              <div class="bg-light p-3 mt-3">
+                <h6>Documentation Template:</h6>
+                <p class="mb-0">
+                  <strong>Ticket Deletion Log:</strong><br />
+                  • Ticket ID: #1234<br />
+                  • Title: "Spam ticket with spam content"<br />
+                  • Reason: Contained spam links<br />
+                  • Deleted by: Admin Name<br />
+                  • Date: 1 July 2025, 2:30 PM<br />
+                  • Screenshot attached: Yes
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

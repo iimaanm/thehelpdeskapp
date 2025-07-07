@@ -1,0 +1,138 @@
+{% extends "base.html" %} {% block title %}Guide: Creating New Tickets{%
+endblock %} {% block content %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item"><a href="/guide">Guide</a></li>
+          <li class="breadcrumb-item active">Create New Tickets</li>
+        </ol>
+      </nav>
+
+      <h1><i class="fa fa-plus text-success"></i> Creating New Tickets</h1>
+      <p class="lead">
+        Learn how to submit effective support tickets that get resolved quickly.
+      </p>
+      <hr />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <h3>Step-by-Step Guide</h3>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5>Step 1: Access the Ticket Creation Form</h5>
+        </div>
+        <div class="card-body">
+          <p>You can create a new ticket in two ways:</p>
+          <ul>
+            <li>
+              <strong>From Home:</strong> Click the "Create Ticket" button on
+              the home page
+            </li>
+            <li>
+              <strong>From Menu:</strong> Navigate to "New Ticket" in the
+              navigation bar
+            </li>
+          </ul>
+          <div class="alert alert-info">
+            <i class="fa fa-lightbulb-o"></i> <strong>Tip:</strong> The home
+            page modal is fastest for quick tickets!
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5>Step 2: Write an Effective Title</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Good titles are specific and descriptive:</strong></p>
+          <div class="row">
+            <div class="col-md-6">
+              <h6 class="text-success">✓ Good Examples:</h6>
+              <ul class="text-success">
+                <li>"Can't access email on work phone"</li>
+                <li>"Printer not working in Farringdon office"</li>
+                <li>
+                  "Password reset required for john.doe@paconsulting.com
+                  account"
+                </li>
+                <li>"Excel crashes when opening large files"</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h6 class="text-danger">✗ Poor Examples:</h6>
+              <ul class="text-danger">
+                <li>"Help required urgently"</li>
+                <li>"Computer problem"</li>
+                <li>"Need assistance"</li>
+                <li>"Urgent!!!"</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5>Step 3: Provide Detailed Description</h5>
+        </div>
+        <div class="card-body">
+          <p><strong>Include these details in your description:</strong></p>
+          <ol>
+            <li>
+              <strong>What were you trying to do?</strong> - Your intended
+              action
+            </li>
+            <li><strong>What happened instead?</strong> - The actual result</li>
+            <li><strong>When did this start?</strong> - Date and time</li>
+            <li>
+              <strong>Error messages:</strong> - Copy exact text if applicable
+            </li>
+            <li>
+              <strong>Steps to reproduce:</strong> - How to recreate the problem
+            </li>
+            <li><strong>Device/software info:</strong> - What you're using</li>
+          </ol>
+
+          <div class="bg-light p-3 mt-3">
+            <h6>Example Description:</h6>
+            <p class="mb-0">
+              "I was trying to print a PDF document from Adobe Reader to the HP
+              printer in the Farringdon office. When I clicked 'Print', I got an
+              error message saying 'Printer not available'. This started
+              happening this morning around 9 AM. Other people in the office are
+              having the same issue. I'm using a Macbook and Adobe Reader
+              version 9.4.2."
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5>Step 4: Submit and Track</h5>
+        </div>
+        <div class="card-body">
+          <ol>
+            <li>Review your ticket before submitting</li>
+            <li>Click "Add Ticket" to create it</li>
+            <li>
+              Ensure you have access to your helpdesk account to view updates
+            </li>
+            <li>Check your dashboard to track your tickets' progress</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      {% include 'guide/partials/_guide_sidebar.html' %}
+    </div>
+  </div>
+</div>
+{% endblock %}

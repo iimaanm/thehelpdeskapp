@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Guide: Update Existing Tickets{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/guide">Guide</a></li>
+                    <li class="breadcrumb-item active">Update Existing Tickets</li>
+                </ol>
+            </nav>
+            
+            <h1><i class="fa fa-edit text-info"></i> Update Existing Tickets</h1>
+            <p class="lead">Learn how to modify and add information to your support tickets.</p>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="guide-content">
+                <div class="alert alert-info">
+                    <i class="fa fa-info-circle"></i> <strong>Note:</strong> You can only update tickets that you created. Admins may also update tickets for clarity and to provide assistance.
+                </div>
+                <h3>Deleting Tickets</h3>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Find Your Ticket</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol>
+                            <li><strong>Go to your Dashboard</strong> - Click "Dashboard" from the menu</li>
+                            <li><strong>Find your ticket</strong> - Look through your ticket list</li>
+                            <li><strong>Click on the edit button</strong> - This opens the ticket details</li>
+                            <li><strong>Edit ticket as necessary</strong> - Ensure the ticket title and description are at least 5 characters long</li>
+                            <li><strong>Click "Update"</strong> - Save your changes</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>When to Update Tickets</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Good reasons to update a ticket:</strong></p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-success">✓ Update When:</h6>
+                                <ul class="text-success">
+                                    <li>You have new information about the problem</li>
+                                    <li>The issue has changed or evolved</li>
+                                    <li>You found a temporary workaround</li>
+                                    <li>Error messages have changed</li>
+                                    <li>You need to clarify previous details</li>
+                                    <li>You discovered the cause</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-danger">✗ Don't Update When:</h6>
+                                <ul class="text-danger">
+                                    <li>Just to ask for updates</li>
+                                    <li>To complain about response time</li>
+                                    <li>When ticket is already resolved</li>
+                                    <li>To change to a different problem entirely</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>    
+            </div>                  
+        <div class="col-md-4">
+      {% include 'guide/partials/_guide_sidebar.html' %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>

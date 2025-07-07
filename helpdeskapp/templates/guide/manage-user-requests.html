@@ -1,0 +1,71 @@
+{% extends "base.html" %} {% block title %}Guide: Manage User Requests{%
+endblock %} {% block content %}
+<div class="container py-5">
+  <div class="row">
+    <div class="col-md-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item"><a href="/guide">Guide</a></li>
+          <li class="breadcrumb-item active">Manage User Requests</li>
+        </ol>
+      </nav>
+
+      <h1><i class="fa fa-users text-info"></i> Manage User Requests</h1>
+      <p class="lead">Learn how to handle user Tickets.</p>
+      <hr />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="guide-content">
+        <h3>Managing User Requests</h3>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>Admin Dashboard Access</h5>
+          </div>
+          <div class="card-body">
+            <p>As an admin, you can manage all user requests:</p>
+            <ul>
+              <li>
+                <strong>From Home:</strong> Click the "Go to Dashboard" button
+              </li>
+              <li>
+                <strong>From Menu:</strong> Navigate to "Dashboard" in the main
+                menu
+              </li>
+            </ul>
+            <div class="alert alert-info">
+              <i class="fa fa-shield"></i> <strong>Admin Privilege:</strong> You
+              can view and manage all tickets system-wide.
+            </div>
+          </div>
+        </div>
+
+        {% include 'guide/partials/_guide_status.html' %}
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>User Management Actions</h5>
+          </div>
+          <div class="card-body">
+            <p><strong>You can perform these actions:</strong></p>
+            <ul>
+              <li>View all tickets from all users</li>
+              <li>Edit any ticket (title, description, priority, status)</li>
+              <li>Delete tickets</li>
+              <li>Change ticket priorities</li>
+              <li>Update ticket status (Open → Resolved or Cancelled)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        {% include 'guide/partials/_guide_sidebar.html' %}{% endblock %}
+      </div>
+    </div>
+  </div>
+</div>
