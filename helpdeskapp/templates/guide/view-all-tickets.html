@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Guide: Viewing all Tickets{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a></li>
+                    <li class="breadcrumb-item"><a href="/guide">Guide</a></li>
+                    <li class="breadcrumb-item active">Viewing All Tickets</li>
+                </ol>
+            </nav>
+
+            <h1><i class="fa fa-search text-primary"></i> Viewing All Tickets</h1>
+            <p class="lead">Learn how to view all support tickets.</p>
+            <hr>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="guide-content">
+                <h3>How to View Your Tickets</h3>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Access Your Dashboard</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Your dashboard is your ticket control center:</p>
+                        <ul>
+                            <li><strong>From Home:</strong> Click the "Go to Dashboard" button</li>
+                            <li><strong>From Menu:</strong> Navigate to "Dashboard" in the main menu</li>
+                        </ul>
+                        <div class="alert alert-info">
+                            <i class="fa fa-lightbulb-o"></i> <strong>Admins:</strong> Can view all tickets, including those submitted by other users.
+                        </div>
+                    </div>
+                </div>
+
+              {% include 'guide/partials/_guide_status.html' %}{% endblock %}
+    </div>
+  </div>
+</div>
+
+    </div>
+</div>

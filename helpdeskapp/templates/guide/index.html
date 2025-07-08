@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Help Guide{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1><i class="fa fa-book text-info"></i> Helpdesk Guide</h1>
+            <p class="lead">Guides to help you use the helpdesk system effectively.</p>
+            <hr>
+        </div>
+    </div>
+<!-- Partials to be displayed depending on user role -->
+    {% if current_user.role == "Admin" %}
+        {% include 'guide/partials/_admin_guide_index.html' %}
+    {% else %}
+        {% include 'guide/partials/_user_guide_index.html' %}
+    {% endif %}
+{% endblock %}

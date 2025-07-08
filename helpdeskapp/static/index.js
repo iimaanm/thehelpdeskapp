@@ -13,12 +13,12 @@ function deleteTicket(ticketId) {
                 // Reloading the current page and allowing flash message to be shown
                 window.location.reload();
             } else {
-                alert('Error: Ticket could not be deleted.');
+                alert('Error: Ticket could not be deleted');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An unexpected error occurred.');
+            alert('An unexpected error occurred');
         });
     }
 }

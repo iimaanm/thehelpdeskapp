@@ -11,7 +11,6 @@ views = Blueprint('views', __name__)
 @login_required
 def home():
     # Home page: introduces user to the app and handles ticket creation via modal form
-    print(current_user.department_id)
     if request.method == 'POST':
         success, message = create_ticket_from_form(request)
         category = 'success' if success else 'danger'
@@ -101,3 +100,32 @@ def delete_ticket():
     else:
         flash('Ticket not found or you do not have permission to delete this ticket', 'danger')
         return jsonify({'message': 'Ticket not found or you do not have permission to delete this ticket'}), 404
+
+@views.route('/guide')
+@login_required
+def guide_index():
+    """Main guide page with all available guides"""
+    return render_template('guide/index.html')
+
+@views.route('/guide/<guide_topic>')
+@login_required
+def guide_topic(guide_topic):
+    """Individual guide topic pages"""
+    # Define available guides for security
+    admin_guides = [
+        'view-all-tickets', 'manage-user-requests', 'delete-tickets'
+    ]
+    user_guides = [
+        'track-your-tickets', 'update-existing-tickets'
+    ]
+    
+    # Check if user has permission to view this guide
+    if current_user.role == "Admin" and guide_topic in admin_guides:
+        return render_template(f'guide/{guide_topic}.html', guide_topic=guide_topic)
+    elif current_user.role == "User" and guide_topic in user_guides:
+        return render_template(f'guide/{guide_topic}.html', guide_topic=guide_topic)
+    elif guide_topic == 'create-new-tickets':
+        return render_template(f'guide/{guide_topic}.html', guide_topic=guide_topic)
+    else:
+        flash('Guide not found', 'error')
+        return redirect(url_for('views.guide_index'))

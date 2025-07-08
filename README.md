@@ -101,3 +101,38 @@ For more details, see the report and ERD included in the project files.
 
 3. Install dependencies:
    pip install -r requirements.txt
+
+## JavaScript Testing (Frontend)
+
+If you want to run tests for the JavaScript files (such as `index.test.js` in `helpdeskapp/static/`), follow these steps:
+
+1. Open a terminal and navigate to the static directory:
+   ```sh
+   cd helpdeskapp/static
+   ```
+2. Install Node.js dependencies (only needed once):
+   ```sh
+   npm install
+   ```
+3. Run the tests:
+   ```sh
+   npm test
+   ```
+
+This uses [Jest](https://jestjs.io/) as the test runner. You can add more `.test.js` files in the same folder to expand your frontend test coverage.
+
+## Python Testing (Backend)
+
+To run all Python tests (for the backend Flask app), use the following instructions:
+
+1. Open a terminal and navigate to the project root directory (where `main.py` and `helpdeskapp/` are located):
+   ```sh
+   cd /Users/iimaan.mohamed/New\ Software\ \&\ Agile\ project
+   ```
+2. Make sure your virtual environment is activated and dependencies are installed.
+3. Run all tests with pytest:
+   ```sh
+   pytest helpdeskapp/
+   ```
+
+This will automatically discover and run all test files in the `helpdeskapp/` directory that start with `test_`.
