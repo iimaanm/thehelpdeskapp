@@ -44,6 +44,7 @@ endblock %} {% block content %}
           </div>
         </div>
 
+        <!-- Includes status partial to explain ticket statuses to admins -->
         {% include 'guide/partials/_guide_status.html' %}
 
         <div class="card mb-4">
@@ -64,8 +65,10 @@ endblock %} {% block content %}
       </div>
 
       <div class="col-md-4">
-        {% include 'guide/partials/_guide_sidebar.html' %}{% endblock %}
+        <!-- Includes sidebar partial for additional admin help information -->
+        {% include 'guide/partials/_guide_sidebar.html' %}
       </div>
     </div>
   </div>
 </div>
+{% endblock %}

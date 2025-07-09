@@ -42,12 +42,14 @@
           </div>
         </div>
 
+        <!-- Includes status partial to show ticket status explanations -->
         {% include 'guide/partials/_guide_status.html' %}
       </div>
-
       <div class="col-md-4">
-        {% include 'guide/partials/_guide_sidebar.html' %}{% endblock %}
+        <!-- Includes the sidebar partial for additional help information -->
+        {% include 'guide/partials/_guide_sidebar.html' %}
       </div>
     </div>
   </div>
 </div>
+{% endblock %}

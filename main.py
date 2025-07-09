@@ -1,4 +1,3 @@
-# main.py
 # Entry point for the Flask application: creates the app instance and runs Flask server
 from helpdeskapp import create_app
 

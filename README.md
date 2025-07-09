@@ -1,23 +1,40 @@
 # Help Desk Web Application - README
 
-## Overview
-This is a Flask-based web application for managing help desk tickets in an organization. It supports two user roles: Admin (full CRUD on all tickets) and User (CRU on their own tickets). The app uses SQLite for data storage and Bootstrap for a modern UI.
+## Application Summary
 
-## Features
-- User registration and login
-- Role-based access (Admin/User)
-- Ticket creation, viewing, editing, and (admin-only) deletion
-- Department assignment for users
-- Flash messages and form validation
-- Responsive, user-friendly interface
+### Problem Statement
+Organizations require efficient ticket management systems to handle employee support requests, technical issues, and departmental queries. Traditional email-based support systems lack proper tracking, prioritization, and role-based access control.
 
-## Dependencies
-- Python 3.x
-- Flask
-- Flask-Login
-- Flask-SQLAlchemy
-- Werkzeug
-- Bootstrap (via CDN)
+### Application Scope
+This Flask-based web application provides a comprehensive help desk solution for university environments. It enables users to submit, track, and manage support tickets while providing administrators with full oversight capabilities. The system supports role-based access control, ensuring proper security and workflow management.
+
+### Core Features
+- **User Management**: Registration, authentication, and role assignment (Admin/User)
+- **Ticket Operations**: Create, read, update, and delete (CRUD) functionality with role restrictions
+- **Department Integration**: User-department associations for better organization
+- **Security**: Form validation, session management, and access control
+- **User Interface**: Responsive Bootstrap design with intuitive navigation
+
+### Technical Architecture
+**Backend**: Python Flask framework with SQLAlchemy ORM for database operations
+**Database**: SQLite with 3-table relational design (User, Ticket, Department)
+**Frontend**: HTML5 templates with Jinja2, Bootstrap CSS, and JavaScript
+**Authentication**: Flask-Login for session management and user authentication
+
+### Dependencies
+- **Core**: Python 3.x, Flask, Flask-Login, Flask-SQLAlchemy
+- **Security**: Werkzeug for password hashing
+- **UI**: Bootstrap 5 (CDN), custom CSS and JavaScript
+- **Testing**: pytest for backend testing, Jest for frontend testing
+
+### Design Documents
+The application follows MVC architecture with clear separation of concerns:
+- **Models** (`models.py`): Database schema and relationships
+- **Views** (`views.py`, `auth.py`): Route handlers and business logic  
+- **Templates**: HTML pages with Jinja2 templating
+- **Static Assets**: CSS, JavaScript, and styling components
+
+The system uses a 3-table relational database design ensuring data integrity and efficient queries. Role-based access control is implemented throughout both backend routes and frontend templates.
 
 ## Setup Instructions
 1. **Clone the repository:**
