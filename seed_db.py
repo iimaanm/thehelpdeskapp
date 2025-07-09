@@ -2,8 +2,7 @@ from helpdeskapp import create_app, db
 from helpdeskapp.models import User, Ticket, Department
 from werkzeug.security import generate_password_hash
 
-app = create_app()
-with app.app_context():
+def seed_database():
     # Clearing existing records to avoid duplicates
     Ticket.query.delete()
     User.query.delete()

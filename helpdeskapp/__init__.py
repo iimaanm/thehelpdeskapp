@@ -38,7 +38,14 @@ def create_app(config=None):
 
 # Function to create a new database if one does not exist
 def create_database(app):
-    if not path.exists('helpdeskapp/' + DB_NAME):
-        with app.app_context():
-            db.create_all()  # Creates all tables defined in models
-    print("Created new database")
+    from seed_db import seed_database
+    db_path = 'helpdeskapp/' + DB_NAME
+    db_exists = path.exists(db_path)
+    
+    with app.app_context():
+        db.create_all()
+        if not db_exists:
+            seed_database()
+            print("Database seeded")
+        else:
+            print("Database already exists")
