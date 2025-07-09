@@ -38,7 +38,7 @@ def test_redirect_to_login_if_not_authenticated_logout(app):
 def test_redirect_to_login_if_not_authenticated_newticket(app):
     """Testing that new ticket page redirects to login when not authenticated."""
     with app.test_client() as client:
-        response = client.get('/new_ticket')
+        response = client.get('/new-ticket')
         assert response.status_code == 302
         assert '/login' in response.location
 

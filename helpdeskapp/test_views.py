@@ -106,7 +106,7 @@ def test_new_ticket_get(client, user):
         sess['_user_id'] = str(user.id)
         sess['_fresh'] = True
 
-    response = client.get("/new_ticket")
+    response = client.get("/new-ticket")
     assert response.status_code == 200
     assert b"Submit a New Ticket" in response.data
 
@@ -116,7 +116,7 @@ def test_new_ticket_post(client, user):
         sess['_user_id'] = str(user.id)
         sess['_fresh'] = True
 
-    response = client.post("/new_ticket", data={
+    response = client.post("/new-ticket", data={
         "title": "Ticket Title 2", 
         "ticket": "Description test"
     }, follow_redirects=True)

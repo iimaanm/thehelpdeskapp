@@ -17,7 +17,7 @@ def home():
         flash(message, category)
     return render_template("home.html", user=current_user)
 
-@views.route('/new_ticket', methods=['GET', 'POST'])
+@views.route('/new-ticket', methods=['GET', 'POST'])
 @login_required
 def new_ticket():
     # New ticket page for creating a new ticket
