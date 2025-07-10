@@ -22,3 +22,30 @@ function deleteTicket(ticketId) {
         });
     }
 }
+
+// Warning user if there are unsaved changes on a form
+let hasUnsavedChanges = false;
+
+// Mark form as having Unsaved Changes on input change
+window.addEventListener('DOMContentLoaded', function () {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        // Skip form inside modals
+        if (form.closest('.modal')) return;
+        form.addEventListener('input', () => {
+            hasUnsavedChanges = true;
+        });
+        // On submit, reset hasUnsavedChanges flag and remove warning
+        form.addEventListener('submit', () => {
+            hasUnsavedChanges = false;
+            window.onbeforeunload = null;
+        });
+    });
+});
+
+window.onbeforeunload = function (e) {
+    if (hasUnsavedChanges) {
+        e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        return 'You have unsaved changes. Are you sure you want to leave?';
+    }
+};

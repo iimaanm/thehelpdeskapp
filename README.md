@@ -3,6 +3,10 @@
 ## Application Summary
 The Helpdesk application is a Flask-based web application that serves as a simple and efficient way to manage support tickets within PA Consulting. It leverages Python 3.13.5, Flask, Flask-Login, Flask-SQLAlchemy and Werkzeug for password hashing. The frontend utilises Bootstrap for styling and JavaScript for user interaction. Backend testing was conducted using Pytest, while the frontend was tested using Jest.
 
+## Deployed Application
+
+You can access the live Helpdesk Web Application here: https://thehelpdeskapp.onrender.com
+
 ### Technical Architecture
 - **Backend**: Python Flask framework with SQLAlchemy for database operations
 - **Database**: SQLite with 3 tables (User, Ticket, Department)
