@@ -4,5 +4,4 @@ from helpdeskapp import create_app
 app = create_app()
 
 if __name__ == '__main__':
-    # Debug mode is ON for development. Turn OFF in production for security.
-    app.run(debug=True)
+    app.run(debug=False)

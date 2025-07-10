@@ -65,7 +65,6 @@ describe('deleteTicket', () => {
         confirm.mockReturnValue(true);
         fetch.mockResolvedValue({ ok: false });
         await deleteTicket(101);
-        // Waiting for promise chain
         await Promise.resolve();
         expect(alert).toHaveBeenCalledWith('Error: Ticket could not be deleted');
     });
@@ -74,7 +73,6 @@ describe('deleteTicket', () => {
         confirm.mockReturnValue(true);
         fetch.mockRejectedValue(new Error('Network error'));
         await deleteTicket(202);
-        // Waiting for promise chain
         await Promise.resolve();
         expect(console.error).toHaveBeenCalled();
         expect(alert).toHaveBeenCalledWith('An unexpected error occurred');
