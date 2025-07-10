@@ -10,7 +10,7 @@
             <hr>
         </div>
     </div>
-<!-- Partials to be displayed depending on user role -->
+<!-- Guide menu partials to be displayed depending on user role -->
     {% if current_user.role == "Admin" %}
         {% include 'guide/partials/_admin_guide_index.html' %}
     {% else %}

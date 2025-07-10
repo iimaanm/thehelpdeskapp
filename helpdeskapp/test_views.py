@@ -384,17 +384,15 @@ def test_guide_index_user_partials(client, user):
     # Check that user guide content is present
     assert b'User Guides' in response.data or b'Creating New Tickets' in response.data
 
-def test_guide_partials_status_partial(client, user):
+def test_guide_partials_status_partial(client, admin):
     """Test that status partial renders correctly."""
     with client.session_transaction() as sess:
-        sess['_user_id'] = str(user.id)
+        sess['_user_id'] = str(admin.id)
         sess['_fresh'] = True
     
     response = client.get('/guide/manage-user-requests')
     assert response.status_code == 200
     
-    # Check that status partial content is present
-    assert b'Understanding Ticket Status' in response.data
-    assert b'badge-primary' in response.data
-    assert b'badge-warning' in response.data
-    assert b'badge-success' in response.data
+    assert b'Managing User Requests' in response.data
+    assert b'Admin Dashboard Access' in response.data
+    assert b'As an admin, you can manage all user requests:' in response.data

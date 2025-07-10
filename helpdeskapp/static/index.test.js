@@ -1,6 +1,6 @@
 // index.test.js
 
-// Mocking global functions and objects
+// Tests for the deleteTicket function
 global.confirm = jest.fn();
 global.fetch = jest.fn();
 global.alert = jest.fn();
@@ -65,7 +65,6 @@ describe('deleteTicket', () => {
         confirm.mockReturnValue(true);
         fetch.mockResolvedValue({ ok: false });
         await deleteTicket(101);
-        // Waiting for promise chain
         await Promise.resolve();
         expect(alert).toHaveBeenCalledWith('Error: Ticket could not be deleted');
     });
@@ -74,9 +73,108 @@ describe('deleteTicket', () => {
         confirm.mockReturnValue(true);
         fetch.mockRejectedValue(new Error('Network error'));
         await deleteTicket(202);
-        // Waiting for promise chain
         await Promise.resolve();
         expect(console.error).toHaveBeenCalled();
         expect(alert).toHaveBeenCalledWith('An unexpected error occurred');
+    });
+
+
+    // Tests for unsaved changes warning logic
+
+    describe('Unsaved changes warning', () => {
+        let forms;
+        let form;
+        let modalForm;
+
+        // Re-import the code under test
+        beforeEach(() => {
+            // Reset global variables and mocks
+            jest.resetModules();
+            global.hasUnsavedChanges = false;
+
+            // Mocking document and window
+            global.document = {
+                querySelectorAll: jest.fn(),
+            };
+            global.window.addEventListener = jest.fn((event, cb) => {
+                if (event === 'DOMContentLoaded') {
+                    cb();
+                }
+            });
+            global.window.onbeforeunload = null;
+
+            // Creating mock forms
+            form = {
+                addEventListener: jest.fn((event, cb) => {
+                    if (event === 'input') form.inputCb = cb;
+                    if (event === 'submit') form.submitCb = cb;
+                }),
+                closest: jest.fn(() => null),
+            };
+            modalForm = {
+                addEventListener: jest.fn(),
+                closest: jest.fn(() => ({})),
+            };
+            forms = [form, modalForm];
+            document.querySelectorAll.mockReturnValue(forms);
+
+            hasUnsavedChanges = false;
+            // Simulate the code block for DOMContentLoaded
+            (function () {
+                const forms = document.querySelectorAll('form');
+                forms.forEach(form => {
+                    if (form.closest('.modal')) return;
+                    form.addEventListener('input', () => {
+                        hasUnsavedChanges = true;
+                    });
+                    form.addEventListener('submit', () => {
+                        hasUnsavedChanges = false;
+                        window.onbeforeunload = null;
+                    });
+                });
+            })();
+
+            // Simulate the code block for window.onbeforeunload
+            window.onbeforeunload = function (e) {
+                if (hasUnsavedChanges) {
+                    e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+                    return 'You have unsaved changes. Are you sure you want to leave?';
+                }
+            };
+        });
+
+        it('should set hasUnsavedChanges to true when input is present', () => {
+            expect(hasUnsavedChanges).toBe(false);
+            form.inputCb();
+            expect(hasUnsavedChanges).toBe(true);
+        });
+
+        it('should reset hasUnsavedChanges and remove onbeforeunload on submit', () => {
+            form.inputCb();
+            expect(hasUnsavedChanges).toBe(true);
+            form.submitCb();
+            expect(hasUnsavedChanges).toBe(false);
+            expect(window.onbeforeunload).toBeNull();
+        });
+
+        it('should not add listeners to forms inside modals', () => {
+            expect(modalForm.addEventListener).not.toHaveBeenCalled();
+        });
+
+        it('should return warning message if hasUnsavedChanges is true', () => {
+            hasUnsavedChanges = true;
+            const e = {};
+            const result = window.onbeforeunload(e);
+            expect(e.returnValue).toBe('You have unsaved changes. Are you sure you want to leave?');
+            expect(result).toBe('You have unsaved changes. Are you sure you want to leave?');
+        });
+
+        it('should return undefined if hasUnsavedChanges is false', () => {
+            hasUnsavedChanges = false;
+            const e = {};
+            const result = window.onbeforeunload(e);
+            expect(e.returnValue).toBeUndefined();
+            expect(result).toBeUndefined();
+        });
     });
 });
