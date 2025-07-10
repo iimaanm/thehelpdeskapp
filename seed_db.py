@@ -3,11 +3,10 @@ from helpdeskapp.models import User, Ticket, Department
 from werkzeug.security import generate_password_hash
 
 def seed_database():
-    # Clearing existing records to avoid duplicates
-    Ticket.query.delete()
-    User.query.delete()
-    Department.query.delete()
-    db.session.commit()
+    # Check if the database is already seeded
+    if Department.query.first() is not None:
+        print("Database already contains data. Skipping seeding.")
+        return
 
     # Seeding Departments
     dept_names = ["IT", "HR", "Finance", "Support", "Sales", "Marketing", "Admin", "Legal", "Development", "Operations"]
