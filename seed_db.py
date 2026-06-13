@@ -1,4 +1,4 @@
-from helpdeskapp import create_app, db
+from helpdeskapp import db
 from helpdeskapp.models import User, Ticket, Department
 from werkzeug.security import generate_password_hash
 import os

@@ -6,6 +6,14 @@ from datetime import datetime, timezone
 from flask import g, has_request_context, request
 from flask_login import current_user
 
+
+SECURITY_EVENT_EXACT_MATCHES = {
+    "ticket.edit.unauthorized",
+    "ticket.delete.unauthorized_or_missing",
+    "guide.access.denied_or_missing",
+    "request.unhandled_exception",
+}
+
 STANDARD_LOG_RECORD_FIELDS = {
     "args",
     "created",
@@ -40,16 +48,30 @@ def get_structured_extra_fields(record):
     }
 
 
+def classify_log_event(message):
+    """Adding a simple label so security events are easy to spot in the log stream."""
+    if message.startswith("auth.") or message in SECURITY_EVENT_EXACT_MATCHES:
+        return "SECURITY"
+    if message.startswith("request.") or message.startswith("database.") or message.startswith("app.startup."):
+        return "OPERATIONAL"
+    return "APPLICATION"
+
+
 class JsonRequestFormatter(logging.Formatter):
     """Writes logs as JSON with request details."""
 
     def format(self, record):
+        event_category = classify_log_event(record.getMessage())
         payload = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "level": record.levelname,
             "logger": record.name,
+            "event_category": event_category,
             "message": record.getMessage(),
         }
+
+        if event_category == "SECURITY":
+            payload["security_event"] = True
 
         if has_request_context():
             payload.update(

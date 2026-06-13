@@ -118,7 +118,7 @@ def create_app(config=None):
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
-    from .models import User, Ticket, Department
+    from .models import User
     create_database(app)
 
     @app.before_request
@@ -126,6 +126,12 @@ def create_app(config=None):
         from flask import g, request
 
         g.request_id = request.headers.get('X-Request-ID', str(uuid.uuid4()))
+
+    @app.route('/favicon.ico')
+    def favicon():
+        from flask import Response
+
+        return Response(status=204)
 
     @app.after_request
     def log_response(response):

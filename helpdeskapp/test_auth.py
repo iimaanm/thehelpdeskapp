@@ -1,8 +1,6 @@
 import pytest
-from flask import url_for
 from werkzeug.security import generate_password_hash
 from flask_login import FlaskLoginClient
-from helpdeskapp.auth import auth
 from helpdeskapp.models import User, Department
 from helpdeskapp import db, create_app
 

@@ -1,5 +1,4 @@
 import pytest
-from flask import url_for
 from flask_login import FlaskLoginClient
 from helpdeskapp import create_app, db
 from helpdeskapp.models import Ticket, User, Department
