@@ -184,7 +184,7 @@ def test_edit_ticket_user_success(client, user):
     )
     
     assert b"Ticket updated successfully" in response.data
-    updated_ticket = Ticket.query.get(ticket.id)
+    updated_ticket = db.session.get(Ticket, ticket.id)
     assert updated_ticket.title == "Edited Title"
     assert updated_ticket.description == "Edited description"
 
@@ -216,7 +216,7 @@ def test_edit_ticket_admin_can_edit_all_fields(client, admin, user):
     )
     
     assert b"Ticket updated successfully" in response.data
-    updated_ticket = Ticket.query.get(ticket.id)
+    updated_ticket = db.session.get(Ticket, ticket.id)
     assert updated_ticket.title == "Admin Edited Title"
     assert updated_ticket.priority == "High"
     assert updated_ticket.status == "Resolved"
@@ -233,7 +233,7 @@ def test_delete_ticket_user(client, user):
     
     response = client.post("/delete-ticket", json={"ticketId": ticket.id})
     assert response.status_code == 200
-    assert Ticket.query.get(ticket.id) is None
+    assert db.session.get(Ticket, ticket.id) is None
 
 def test_delete_ticket_admin(client, admin, user):
     """Testing that admin users can delete any ticket."""
@@ -247,7 +247,7 @@ def test_delete_ticket_admin(client, admin, user):
     
     response = client.post("/delete-ticket", json={"ticketId": ticket.id})
     assert response.status_code == 200
-    assert Ticket.query.get(ticket.id) is None
+    assert db.session.get(Ticket, ticket.id) is None
 
 def test_delete_ticket_permission_denied(client, user, admin):
     """Testing that users cannot delete tickets that don't belong to them."""
@@ -261,7 +261,7 @@ def test_delete_ticket_permission_denied(client, user, admin):
     
     response = client.post("/delete-ticket", json={"ticketId": ticket.id})
     assert response.status_code == 404
-    assert Ticket.query.get(ticket.id) is not None
+    assert db.session.get(Ticket, ticket.id) is not None
 
 def test_edit_ticket_validation_short_title(client, user):
     """Testing that edit ticket fails with short title."""

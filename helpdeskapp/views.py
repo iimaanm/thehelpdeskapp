@@ -41,7 +41,7 @@ def dashboard():
 @login_required
 def edit_ticket(ticket_id):
     # Edit ticket: Only Admin or the ticket owner can edit
-    ticket = Ticket.query.get_or_404(ticket_id)
+    ticket = db.get_or_404(Ticket, ticket_id)
     if current_user.role != "Admin" and ticket.user_id != current_user.id:
         flash("You don't have permission to edit this ticket", "danger")
         return redirect(url_for('views.dashboard'))
@@ -91,7 +91,7 @@ def delete_ticket():
     # Delete ticket: User - only ticket owner can delete. Admin - can delete any ticket.
     ticket = json.loads(request.data)
     ticketId = ticket['ticketId']
-    ticket = Ticket.query.get(ticketId)
+    ticket = db.session.get(Ticket, ticketId)
     if ticket and (ticket.user_id == current_user.id or current_user.role == "Admin"):
         db.session.delete(ticket)
         db.session.commit()

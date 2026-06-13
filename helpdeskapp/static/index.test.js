@@ -1,5 +1,3 @@
-// index.test.js
-
 // Tests for the deleteTicket function
 global.confirm = jest.fn();
 global.fetch = jest.fn();
