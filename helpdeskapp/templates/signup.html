@@ -56,15 +56,6 @@
       placeholder="Confirm password"
     />
   </div>
-  <!-- Role selection -->
-  <div class="form-group">
-    <label for="role">Role</label>
-    <select class="custom-select" name="role" id="role">
-      <option value="" selected disabled>Select a Role</option>
-      <option value="User">User</option>
-      <option value="Admin">Admin</option>
-    </select>
-  </div>
   <!-- Department selection (optional) -->
   <div class="form-group">
     <label for="department_name">Department (optional)</label>
@@ -79,6 +70,10 @@
       <option value="Resourcing">Resourcing</option>
     </select>
   </div>
+  <small class="form-text text-muted"
+    >New accounts are created as standard users. Admin access is assigned
+    separately.</small
+  >
   <br />
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>

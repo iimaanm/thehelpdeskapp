@@ -118,10 +118,13 @@ def test_signup_post_success(client):
         "first_name": "New",
         "password": "Newpassword123!",
         "passwordConfirm": "Newpassword123!",
-        "role": "User",
         "department_name": "HR"
     }, follow_redirects=True)
     assert b"account created successfully" in response.data.lower()
+
+    created_user = User.query.filter_by(username="newuser").first()
+    assert created_user is not None
+    assert created_user.role == "User"
 
 def test_signup_post_existing_username(client, user):
     """Testing signup fails when username already exists."""
@@ -130,19 +133,17 @@ def test_signup_post_existing_username(client, user):
         "first_name": "Test",
         "password": "password123",
         "passwordConfirm": "password123",
-        "role": "User",
         "department_name": ""
     }, follow_redirects=True)
     assert b"username already exists" in response.data.lower()
 
 @pytest.mark.parametrize("data,expected", [
-    ({"username": "", "first_name": "A", "password": "pass123", "passwordConfirm": "pass123", "role": "user", "department_name": ""}, b"username is required"),
-    ({"username": "short", "first_name": "A", "password": "pass123", "passwordConfirm": "pass123", "role": "User", "department_name": ""}, b"username must be at least 6 characters long"),
-    ({"username": "validuser", "first_name": "A", "password": "", "passwordConfirm": "", "role": "User", "department_name": ""}, b"password is required"),
-    ({"username": "validuser", "first_name": "A", "password": "short", "passwordConfirm": "short", "role": "User", "department_name": ""}, b"password must be at least 12 characters long"),
-    ({"username": "validuser", "first_name": "A", "password": "ValidPassword1!", "passwordConfirm": "", "role": "User", "department_name": ""}, b"password confirmation is required"),
-    ({"username": "validuser", "first_name": "A", "password": "ValidPassword1!", "passwordConfirm": "DifferentPass1!", "role": "User", "department_name": ""}, b"passwords must match"),
-    ({"username": "validuser", "first_name": "A", "password": "ValidPassword1!", "passwordConfirm": "ValidPassword1!", "role": "None", "department_name": ""}, b"role is required")
+    ({"username": "", "first_name": "A", "password": "pass123", "passwordConfirm": "pass123", "department_name": ""}, b"username is required"),
+    ({"username": "short", "first_name": "A", "password": "pass123", "passwordConfirm": "pass123", "department_name": ""}, b"username must be at least 6 characters long"),
+    ({"username": "validuser", "first_name": "A", "password": "", "passwordConfirm": "", "department_name": ""}, b"password is required"),
+    ({"username": "validuser", "first_name": "A", "password": "short", "passwordConfirm": "short", "department_name": ""}, b"password must be at least 12 characters long"),
+    ({"username": "validuser", "first_name": "A", "password": "ValidPassword1!", "passwordConfirm": "", "department_name": ""}, b"password confirmation is required"),
+    ({"username": "validuser", "first_name": "A", "password": "ValidPassword1!", "passwordConfirm": "DifferentPass1!", "department_name": ""}, b"passwords must match")
 ])
 def test_signup_post_validation(client, data, expected):
     """Testing signup validation for invalid input scenarios."""
@@ -164,10 +165,25 @@ def test_signup_password_policy_requirements(client, password, expected):
         "first_name": "A",
         "password": password,
         "passwordConfirm": password,
-        "role": "User",
         "department_name": ""
     }, follow_redirects=True)
     assert expected in response.data.lower()
+
+
+def test_signup_ignores_admin_role_submission(client):
+    response = client.post("/signup", data={
+        "username": "normaluser",
+        "first_name": "Normal",
+        "password": "ValidPassword1!",
+        "passwordConfirm": "ValidPassword1!",
+        "role": "Admin",
+        "department_name": ""
+    }, follow_redirects=True)
+
+    assert b"account created successfully" in response.data.lower()
+    created_user = User.query.filter_by(username="normaluser").first()
+    assert created_user is not None
+    assert created_user.role == "User"
 def test_logout_requires_login(client):
     """Testing that logout redirects to login if user not authenticated."""
     response = client.get("/logout", follow_redirects=True)

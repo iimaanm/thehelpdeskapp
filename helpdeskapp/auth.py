@@ -96,7 +96,6 @@ def signup():
         first_name = str(request.form.get('first_name')).strip()
         password = request.form.get('password')
         passwordConfirm = request.form.get('passwordConfirm')
-        role = str(request.form.get('role')).strip()
         department_name = str(request.form.get('department_name')).strip()
         resolved_department_id = None
         # Form validation
@@ -116,8 +115,6 @@ def signup():
             flash('Password confirmation is required', category='danger')
         elif password != passwordConfirm:
             flash('Passwords must match', category='danger')
-        elif not role or role == "None":
-            flash('Role is required', category='danger')
         else:
             if department_name:
                 selected_department = Department.query.filter_by(name=department_name).first()
@@ -136,7 +133,7 @@ def signup():
                 username=username,
                 first_name=first_name,
                 password=generate_password_hash(password),
-                role=role,
+                role='User',
                 department_id=resolved_department_id,
             )
             db.session.add(new_user)

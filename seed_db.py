@@ -12,8 +12,6 @@ DEFAULT_DEPARTMENTS = [
     "Facilities",
     "Resourcing",
 ]
-
-
 def ensure_departments_exist():
     """Creates required lookup departments if they are missing."""
     existing_departments = {department.name for department in Department.query.all()}
@@ -23,6 +21,37 @@ def ensure_departments_exist():
     if missing_departments:
         db.session.add_all(missing_departments)
         db.session.commit()
+
+
+def ensure_admin_user_exists():
+    """Creates a single controlled admin account for SQLite fallback mode."""
+    admin_username = str(os.getenv('DEFAULT_ADMIN_USERNAME', 'demo_admin')).strip()
+    admin_first_name = str(os.getenv('DEFAULT_ADMIN_FIRST_NAME', 'Demo')).strip()
+    admin_password = os.getenv('DEFAULT_ADMIN_PASSWORD')
+    admin_department_name = str(os.getenv('DEFAULT_ADMIN_DEPARTMENT', 'Consulting')).strip()
+
+    if not admin_username or not admin_password:
+        print('SQLite fallback admin credentials are incomplete. Skipping admin bootstrap.')
+        return
+
+    if User.query.filter_by(username=admin_username).first() is not None:
+        return
+
+    department = Department.query.filter_by(name=admin_department_name).first()
+    if department is None:
+        department = Department(name=admin_department_name)
+        db.session.add(department)
+        db.session.flush()
+
+    admin_user = User(
+        username=admin_username,
+        first_name=admin_first_name,
+        password=generate_password_hash(admin_password),
+        role='Admin',
+        department_id=department.id,
+    )
+    db.session.add(admin_user)
+    db.session.commit()
 
 def seed_database():
     # Check if the database is already seeded
@@ -49,6 +78,18 @@ def seed_database():
             department_id=dept_by_name[dept_name].id
         )
         db.session.add(user)
+
+    seeded_admin_username = os.getenv('SEED_ADMIN_USERNAME', 'admin_demo')
+    seeded_admin_password = os.getenv('SEED_ADMIN_PASSWORD', default_seed_password)
+    seeded_admin_department = dept_by_name.get('Admin')
+    admin_user = User(
+        username=seeded_admin_username,
+        first_name='Admin',
+        password=generate_password_hash(seeded_admin_password),
+        role='Admin',
+        department_id=seeded_admin_department.id if seeded_admin_department else None,
+    )
+    db.session.add(admin_user)
     db.session.commit()
 
     # Seeding Tickets

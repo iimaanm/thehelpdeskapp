@@ -3,7 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 import uuid
 from flask_login import LoginManager
-from sqlalchemy import inspect, text
+from sqlalchemy import create_engine, inspect, text
+from sqlalchemy.exc import SQLAlchemyError
 from datetime import timedelta
 from werkzeug.exceptions import HTTPException
 
@@ -19,18 +20,54 @@ def parse_bool(value, default=False):
         return default
     return str(value).strip().lower() in {"1", "true", "yes", "on"}
 
+
+def normalize_database_url(database_url):
+    if database_url.startswith('postgres://'):
+        return database_url.replace('postgres://', 'postgresql+psycopg://', 1)
+    if database_url.startswith('postgresql://') and not database_url.startswith('postgresql+psycopg://'):
+        return database_url.replace('postgresql://', 'postgresql+psycopg://', 1)
+    return database_url
+
+
+def can_connect_to_database(database_url):
+    try:
+        engine = create_engine(database_url, pool_pre_ping=True)
+        with engine.connect():
+            pass
+        engine.dispose()
+        return True
+    except SQLAlchemyError:
+        return False
+
+
+def resolve_database_uri(app_env, allow_sqlite_fallback):
+    fallback_uri = f'sqlite:///{DB_NAME}'
+    database_url = normalize_database_url(os.getenv('DATABASE_URL', fallback_uri))
+
+    if database_url.startswith('sqlite://'):
+        return database_url, False
+
+    if can_connect_to_database(database_url):
+        return database_url, False
+
+    if allow_sqlite_fallback:
+        return fallback_uri, True
+
+    return database_url, False
+
 def create_app(config=None):
     # Configuring the Flask app
     app = Flask(__name__)
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'placeholder-secret-key')  # Default
-    database_url = os.getenv('DATABASE_URL', f'sqlite:///{DB_NAME}')
-    if database_url.startswith('postgres://'):
-        database_url = database_url.replace('postgres://', 'postgresql+psycopg://', 1)
-    elif database_url.startswith('postgresql://') and not database_url.startswith('postgresql+psycopg://'):
-        database_url = database_url.replace('postgresql://', 'postgresql+psycopg://', 1)
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['APP_ENV'] = os.getenv('APP_ENV', 'development').lower()
+    app.config['ALLOW_SQLITE_FALLBACK'] = parse_bool(os.getenv('ALLOW_SQLITE_FALLBACK'), default=True)
+    resolved_database_url, using_sqlite_fallback = resolve_database_uri(
+        app.config['APP_ENV'],
+        app.config['ALLOW_SQLITE_FALLBACK'],
+    )
+    app.config['SQLALCHEMY_DATABASE_URI'] = resolved_database_url
+    app.config['USING_SQLITE_FALLBACK'] = using_sqlite_fallback
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['AUTO_SEED_DB'] = parse_bool(os.getenv('AUTO_SEED_DB'), default=False)
     app.config['DB_INIT_ON_STARTUP'] = parse_bool(
         os.getenv('DB_INIT_ON_STARTUP'),
@@ -46,6 +83,8 @@ def create_app(config=None):
         raise RuntimeError('SECRET_KEY must be set in production')
 
     logger = configure_logging(app)
+    if using_sqlite_fallback:
+        logger.warning('database.sqlite_fallback_activated')
 
     # Secure cookie defaults: strict in production, workable during local development/tests.
     is_production_like = not app.config.get('DEBUG', False) and not app.config.get('TESTING', False)
@@ -112,7 +151,7 @@ def create_app(config=None):
 
 # Function to create a new database if one does not exist
 def create_database(app):
-    from seed_db import ensure_departments_exist, seed_database
+    from seed_db import ensure_admin_user_exists, ensure_departments_exist, seed_database
 
     if not app.config.get('DB_INIT_ON_STARTUP', True):
         app.logger.info('database.init_skipped')
@@ -122,6 +161,8 @@ def create_database(app):
         db.create_all()
         ensure_user_security_columns()
         ensure_departments_exist()
+        if app.config.get('USING_SQLITE_FALLBACK', False):
+            ensure_admin_user_exists()
         should_seed = app.config.get('AUTO_SEED_DB', False) and app.config.get('APP_ENV') != 'production'
         if should_seed and is_database_empty():
             seed_database()

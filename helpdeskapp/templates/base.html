@@ -35,7 +35,7 @@
               User
             {% endif %}          
           </span>
-          <span class="badge badge-info">{{ current_user.department_id if current_user.department_id != "None" else "" }}</span>
+          <span class="badge badge-info">{{ current_user.department_name if current_user.department_id != "None" else "" }}</span>
         {% else %}
           <a class="nav-item nav-link mx-2" id="signup" href="/signup">Sign Up</a>
           <a class="nav-item nav-link mx-2" id="login" href="/login">Login</a>
