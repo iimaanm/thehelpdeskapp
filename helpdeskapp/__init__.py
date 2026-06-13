@@ -112,7 +112,7 @@ def create_app(config=None):
 
 # Function to create a new database if one does not exist
 def create_database(app):
-    from seed_db import seed_database
+    from seed_db import ensure_departments_exist, seed_database
 
     if not app.config.get('DB_INIT_ON_STARTUP', True):
         app.logger.info('database.init_skipped')
@@ -121,6 +121,7 @@ def create_database(app):
     with app.app_context():
         db.create_all()
         ensure_user_security_columns()
+        ensure_departments_exist()
         should_seed = app.config.get('AUTO_SEED_DB', False) and app.config.get('APP_ENV') != 'production'
         if should_seed and is_database_empty():
             seed_database()

@@ -1,5 +1,6 @@
 import pytest
 from helpdeskapp import create_app
+from helpdeskapp.models import Department
 
 @pytest.fixture
 def app():
@@ -103,3 +104,10 @@ def test_production_requires_secret_key(monkeypatch):
     monkeypatch.delenv('SECRET_KEY', raising=False)
     with pytest.raises(RuntimeError):
         create_app({'APP_ENV': 'production', 'SECRET_KEY': 'placeholder-secret-key'})
+
+
+def test_department_lookup_rows_are_bootstrapped(app):
+    """Testing that required department lookup rows exist after app initialization."""
+    with app.app_context():
+        department_names = {department.name for department in Department.query.all()}
+    assert {'Consulting', 'Business', 'HR', 'Finance', 'Marketing', 'Facilities', 'Resourcing'}.issubset(department_names)

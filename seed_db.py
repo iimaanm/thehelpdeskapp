@@ -3,6 +3,27 @@ from helpdeskapp.models import User, Ticket, Department
 from werkzeug.security import generate_password_hash
 import os
 
+DEFAULT_DEPARTMENTS = [
+    "Consulting",
+    "Business",
+    "HR",
+    "Finance",
+    "Marketing",
+    "Facilities",
+    "Resourcing",
+]
+
+
+def ensure_departments_exist():
+    """Creates required lookup departments if they are missing."""
+    existing_departments = {department.name for department in Department.query.all()}
+    missing_departments = [
+        Department(name=name) for name in DEFAULT_DEPARTMENTS if name not in existing_departments
+    ]
+    if missing_departments:
+        db.session.add_all(missing_departments)
+        db.session.commit()
+
 def seed_database():
     # Check if the database is already seeded
     if Department.query.first() is not None:
