@@ -144,7 +144,9 @@ def is_database_empty():
 def ensure_user_security_columns():
     """Adds newly introduced authentication security columns on existing databases."""
     inspector = inspect(db.engine)
-    columns = {column['name'] for column in inspector.get_columns('user')}
+    user_columns = inspector.get_columns('user')
+    columns = {column['name'] for column in user_columns}
+    password_column = next((column for column in user_columns if column['name'] == 'password'), None)
 
     with db.engine.begin() as connection:
         if 'failed_login_attempts' not in columns:
@@ -154,4 +156,9 @@ def ensure_user_security_columns():
         if 'lockout_until' not in columns:
             connection.execute(
                 text('ALTER TABLE "user" ADD COLUMN lockout_until DATETIME')
+            )
+        password_length = getattr(password_column.get('type'), 'length', None) if password_column else None
+        if password_length is not None and password_length < 255 and db.engine.dialect.name == 'postgresql':
+            connection.execute(
+                text('ALTER TABLE "user" ALTER COLUMN password TYPE VARCHAR(255)')
             )

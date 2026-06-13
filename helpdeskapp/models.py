@@ -7,7 +7,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)  # Unique username
     first_name = db.Column(db.String(150), nullable=False)  # User's first name
-    password = db.Column(db.String(150), nullable=False)  # Hashed password
+    password = db.Column(db.String(255), nullable=False)  # Hashed password
     role = db.Column(db.String(150), nullable=False)  # 'Admin' or 'User'
     department_id = db.Column(db.Integer, db.ForeignKey('department.id'), nullable=True)  # Foreign key to Department
     failed_login_attempts = db.Column(db.Integer, nullable=False, default=0)  # Failed login counter for lockout
