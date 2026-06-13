@@ -1,6 +1,7 @@
 from helpdeskapp import create_app, db
 from helpdeskapp.models import User, Ticket, Department
 from werkzeug.security import generate_password_hash
+import os
 
 def seed_database():
     # Check if the database is already seeded
@@ -16,12 +17,13 @@ def seed_database():
     dept_by_name = {dept.name: dept for dept in Department.query.all()}
 
     # Seeding Users (id's are auto incremented)
+    default_seed_password = os.getenv('SEED_DEFAULT_PASSWORD', 'TempPass123!')
     for i in range(10):
         dept_name = dept_names[i % len(dept_names)]
         user = User(
             username=f"user{i}",
             first_name=f"User{i}",
-            password=generate_password_hash("password"),
+            password=generate_password_hash(default_seed_password),
             role="User",
             department_id=dept_by_name[dept_name].id
         )

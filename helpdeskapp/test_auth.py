@@ -3,7 +3,7 @@ from flask import url_for
 from werkzeug.security import generate_password_hash
 from flask_login import FlaskLoginClient
 from helpdeskapp.auth import auth
-from helpdeskapp.models import User
+from helpdeskapp.models import User, Department
 from helpdeskapp import db, create_app
 
 @pytest.fixture
@@ -26,12 +26,16 @@ def runner(app):
 
 @pytest.fixture
 def user(app):
+    department = Department(name="IT")
+    db.session.add(department)
+    db.session.flush()
+
     user = User(
         username="test_helpdesk_user",
         first_name="Test",
         password=generate_password_hash("password123"),
         role="User",
-        department_id="1"
+        department_id=department.id
     )
     db.session.add(user)
     db.session.commit()
@@ -57,7 +61,7 @@ def test_login_post_wrong_password(client, user):
         "username": "test_helpdesk_user",
         "password": "wrongpassword"
     }, follow_redirects=True)
-    assert b"incorrect password" in response.data.lower()
+    assert b"invalid username or password" in response.data.lower()
 
 def test_login_user_not_found(client):
     """Testing login fails when username does not exist."""
@@ -65,7 +69,29 @@ def test_login_user_not_found(client):
         "username": "nouser",
         "password": "password123"
     }, follow_redirects=True)
-    assert b"user not found" in response.data.lower()
+    assert b"invalid username or password" in response.data.lower()
+
+
+def test_login_locks_account_after_three_failed_attempts(client, user):
+    """Testing login lockout after three failed attempts."""
+    for _ in range(2):
+        response = client.post("/login", data={
+            "username": "test_helpdesk_user",
+            "password": "wrongpassword"
+        }, follow_redirects=True)
+        assert b"invalid username or password" in response.data.lower()
+
+    third_response = client.post("/login", data={
+        "username": "test_helpdesk_user",
+        "password": "wrongpassword"
+    }, follow_redirects=True)
+    assert b"account locked after too many failed attempts" in third_response.data.lower()
+
+    locked_response = client.post("/login", data={
+        "username": "test_helpdesk_user",
+        "password": "password123"
+    }, follow_redirects=True)
+    assert b"account locked after too many failed attempts" in locked_response.data.lower()
 
 def test_login_post_missing_fields(client):
     """Testing login fails when username and password are missing."""
@@ -83,13 +109,17 @@ def test_signup_get(client):
 
 def test_signup_post_success(client):
     """Testing successful signup with valid data."""
+    department = Department(name="HR")
+    db.session.add(department)
+    db.session.commit()
+
     response = client.post("/signup", data={
         "username": "newuser",
         "first_name": "New",
-        "password": "newpassword123",
-        "passwordConfirm": "newpassword123",
+        "password": "Newpassword123!",
+        "passwordConfirm": "Newpassword123!",
         "role": "User",
-        "department_id": "1"
+        "department_name": "HR"
     }, follow_redirects=True)
     assert b"account created successfully" in response.data.lower()
 
@@ -101,24 +131,43 @@ def test_signup_post_existing_username(client, user):
         "password": "password123",
         "passwordConfirm": "password123",
         "role": "User",
-        "department_id": "1"
+        "department_name": ""
     }, follow_redirects=True)
     assert b"username already exists" in response.data.lower()
 
 @pytest.mark.parametrize("data,expected", [
-    ({"username": "", "first_name": "A", "password": "pass123", "passwordConfirm": "pass123", "role": "user", "department_id": "1"}, b"username is required"),
-    ({"username": "short", "first_name": "A", "password": "pass123", "passwordConfirm": "pass123", "role": "User", "department_id": "1"}, b"username must be at least 6 characters long"),
-    ({"username": "validuser", "first_name": "A", "password": "", "passwordConfirm": "", "role": "User", "department_id": "1"}, b"password is required"),
-    ({"username": "validuser", "first_name": "A", "password": "short", "passwordConfirm": "short", "role": "User", "department_id": "1"}, b"password must be at least 6 characters long"),
-    ({"username": "validuser", "first_name": "A", "password": "password", "passwordConfirm": "", "role": "User", "department_id": "1"}, b"password confirmation is required"),
-    ({"username": "validuser", "first_name": "A", "password": "password", "passwordConfirm": "different", "role": "User", "department_id": "1"}, b"passwords must match"),
-    ({"username": "validuser", "first_name": "A", "password": "password", "passwordConfirm": "password", "role": "None", "department_id": "1"}, b"role is required")
+    ({"username": "", "first_name": "A", "password": "pass123", "passwordConfirm": "pass123", "role": "user", "department_name": ""}, b"username is required"),
+    ({"username": "short", "first_name": "A", "password": "pass123", "passwordConfirm": "pass123", "role": "User", "department_name": ""}, b"username must be at least 6 characters long"),
+    ({"username": "validuser", "first_name": "A", "password": "", "passwordConfirm": "", "role": "User", "department_name": ""}, b"password is required"),
+    ({"username": "validuser", "first_name": "A", "password": "short", "passwordConfirm": "short", "role": "User", "department_name": ""}, b"password must be at least 12 characters long"),
+    ({"username": "validuser", "first_name": "A", "password": "ValidPassword1!", "passwordConfirm": "", "role": "User", "department_name": ""}, b"password confirmation is required"),
+    ({"username": "validuser", "first_name": "A", "password": "ValidPassword1!", "passwordConfirm": "DifferentPass1!", "role": "User", "department_name": ""}, b"passwords must match"),
+    ({"username": "validuser", "first_name": "A", "password": "ValidPassword1!", "passwordConfirm": "ValidPassword1!", "role": "None", "department_name": ""}, b"role is required")
 ])
 def test_signup_post_validation(client, data, expected):
     """Testing signup validation for invalid input scenarios."""
     response = client.post("/signup", data=data, follow_redirects=True)
     assert expected in response.data.lower()
 
+
+@pytest.mark.parametrize("password,expected", [
+    ("alllowercase123!", b"password must include at least one uppercase letter"),
+    ("ALLUPPERCASE123!", b"password must include at least one lowercase letter"),
+    ("NoNumbersUsed!!", b"password must include at least one number"),
+    ("NoSpecial12345", b"password must include at least one special character"),
+    ("validuser123!A", b"password cannot contain your username")
+])
+def test_signup_password_policy_requirements(client, password, expected):
+    """Testing that signup enforces stronger password policy rules."""
+    response = client.post("/signup", data={
+        "username": "validuser",
+        "first_name": "A",
+        "password": password,
+        "passwordConfirm": password,
+        "role": "User",
+        "department_name": ""
+    }, follow_redirects=True)
+    assert expected in response.data.lower()
 def test_logout_requires_login(client):
     """Testing that logout redirects to login if user not authenticated."""
     response = client.get("/logout", follow_redirects=True)

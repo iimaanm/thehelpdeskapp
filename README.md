@@ -9,7 +9,7 @@ You can access the live Helpdesk Web Application here: https://thehelpdeskapp.on
 
 ### Technical Architecture
 - **Backend**: Python Flask framework with SQLAlchemy for database operations
-- **Database**: SQLite with 3 tables (User, Ticket, Department)
+- **Database**: SQLite for local development and PostgreSQL (Neon/Render) for deployed environments
 - **Frontend**: HTML with Jinja2, Bootstrap and JavaScript
 - **Authentication**: Flask-Login for session management and user authentication
 
@@ -48,17 +48,36 @@ The application follows MVC architecture:
    ```sh
    pip install -r requirements.txt
    ```
-4. **Run the application:**
+4. **Create environment variables (recommended):**
+   ```sh
+   export SECRET_KEY="replace-with-a-long-random-value"
+   export APP_ENV="development"
+   export AUTO_SEED_DB="true"
+   # Optional: use Neon/PostgreSQL locally instead of SQLite
+   # export DATABASE_URL="postgresql://user:password@host/dbname?sslmode=require"
+   ```
+5. **Run the application:**
    ```sh
    python3 main.py
    ```
-5. **The database should seed automatically.**
-If not, run the following command in the terminal:
+6. **Seed data (development only).**
+Seeding is disabled by default unless `AUTO_SEED_DB=true` and the database is empty.
+If needed, run the following command in the terminal:
    ```sh
    python3 seed_db.py
    ```
 7. **Access the app:**
    Open your browser and go to [http://localhost:5000](http://localhost:5000)
+
+## Production Environment Variables (Render)
+
+Set these in your Render service environment:
+
+- `DATABASE_URL` - Neon/Render PostgreSQL connection string (with `sslmode=require`)
+- `SECRET_KEY` - Long random secret key
+- `APP_ENV=production`
+- `AUTO_SEED_DB=false`
+- `DB_INIT_ON_STARTUP=false` (recommended when using migrations)
 
 
 ## JavaScript Testing (Frontend)

@@ -10,6 +10,8 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(150), nullable=False)  # Hashed password
     role = db.Column(db.String(150), nullable=False)  # 'Admin' or 'User'
     department_id = db.Column(db.Integer, db.ForeignKey('department.id'), nullable=True)  # Foreign key to Department
+    failed_login_attempts = db.Column(db.Integer, nullable=False, default=0)  # Failed login counter for lockout
+    lockout_until = db.Column(db.DateTime(timezone=True), nullable=True)  # Lock expiry timestamp
     tickets = db.relationship('Ticket', backref='user')  # Relationship to tickets
 
 # Ticket model for helpdesk tickets

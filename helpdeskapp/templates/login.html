@@ -12,9 +12,15 @@
       class="form-control"
       id="username"
       name="username"
+      value="{{ entered_username or '' }}"
       placeholder="Enter user name"
+      autocomplete="username"
       required
     />
+    <small class="form-text text-muted"
+      >For security, accounts will be temporarily locked after repeated failed
+      login attempts.</small
+    >
   </div>
   <!-- Password field -->
   <div class="form-group">
@@ -25,6 +31,7 @@
       id="passwordLogin"
       name="password"
       placeholder="Enter password"
+      autocomplete="current-password"
       required
     />
   </div>

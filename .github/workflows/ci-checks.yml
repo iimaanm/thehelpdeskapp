@@ -73,4 +73,3 @@ jobs:
         working-directory: helpdeskapp/static
         run: |
           npm audit --audit-level=high
-
