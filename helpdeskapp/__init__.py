@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+import logging
 import os
 import uuid
 from flask_login import LoginManager
@@ -56,9 +57,9 @@ def resolve_database_uri(app_env, allow_sqlite_fallback):
     return database_url, False
 
 def create_app(config=None):
-    # Configuring the Flask app
+    # Set up the Flask app.
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'placeholder-secret-key')  # Default
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'placeholder-secret-key')
     app.config['APP_ENV'] = os.getenv('APP_ENV', 'development').lower()
     app.config['ALLOW_SQLITE_FALLBACK'] = parse_bool(os.getenv('ALLOW_SQLITE_FALLBACK'), default=True)
     resolved_database_url, using_sqlite_fallback = resolve_database_uri(
@@ -83,10 +84,18 @@ def create_app(config=None):
         raise RuntimeError('SECRET_KEY must be set in production')
 
     logger = configure_logging(app)
+    logger.info(
+        'app.startup.configured',
+        extra={
+            'app_env': app.config['APP_ENV'],
+            'using_sqlite_fallback': using_sqlite_fallback,
+            'db_init_on_startup': app.config['DB_INIT_ON_STARTUP'],
+        },
+    )
     if using_sqlite_fallback:
-        logger.warning('database.sqlite_fallback_activated')
+        logger.warning('database.sqlite_fallback_activated', extra={'database_backend': 'sqlite'})
 
-    # Secure cookie defaults: strict in production, workable during local development/tests.
+    # Use secure cookies outside debug and tests.
     is_production_like = not app.config.get('DEBUG', False) and not app.config.get('TESTING', False)
     app.config.setdefault('SESSION_COOKIE_HTTPONLY', True)
     app.config['SESSION_COOKIE_SAMESITE'] = app.config.get('SESSION_COOKIE_SAMESITE') or 'Lax'
@@ -109,7 +118,6 @@ def create_app(config=None):
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
-    # Importing models to ensure tables are created
     from .models import User, Ticket, Department
     create_database(app)
 
@@ -149,8 +157,8 @@ def create_app(config=None):
     
     return app
 
-# Function to create a new database if one does not exist
 def create_database(app):
+    """Create tables and run startup database tasks."""
     from seed_db import ensure_admin_user_exists, ensure_departments_exist, seed_database
 
     if not app.config.get('DB_INIT_ON_STARTUP', True):
@@ -163,8 +171,10 @@ def create_database(app):
         ensure_departments_exist()
         if app.config.get('USING_SQLITE_FALLBACK', False):
             ensure_admin_user_exists()
+            app.logger.warning('database.fallback_admin_bootstrap_attempted')
         should_seed = app.config.get('AUTO_SEED_DB', False) and app.config.get('APP_ENV') != 'production'
         if should_seed and is_database_empty():
+            app.logger.info('database.seed_started')
             seed_database()
         elif should_seed:
             app.logger.info('database.seed_skipped_existing_data')
@@ -173,7 +183,7 @@ def create_database(app):
 
 
 def is_database_empty():
-    """Returns True if core tables are all empty."""
+    """Return True if the main tables are empty."""
     from .models import Department, User, Ticket
     return (
         Department.query.first() is None
@@ -183,7 +193,7 @@ def is_database_empty():
 
 
 def ensure_user_security_columns():
-    """Adds newly introduced authentication security columns on existing databases."""
+    """Add missing security columns to older databases."""
     inspector = inspect(db.engine)
     user_columns = inspector.get_columns('user')
     columns = {column['name'] for column in user_columns}
@@ -191,15 +201,21 @@ def ensure_user_security_columns():
 
     with db.engine.begin() as connection:
         if 'failed_login_attempts' not in columns:
+            logging.getLogger('helpdeskapp').info('database.schema.adding_failed_login_attempts')
             connection.execute(
                 text('ALTER TABLE "user" ADD COLUMN failed_login_attempts INTEGER NOT NULL DEFAULT 0')
             )
         if 'lockout_until' not in columns:
+            logging.getLogger('helpdeskapp').info('database.schema.adding_lockout_until')
             connection.execute(
                 text('ALTER TABLE "user" ADD COLUMN lockout_until DATETIME')
             )
         password_length = getattr(password_column.get('type'), 'length', None) if password_column else None
         if password_length is not None and password_length < 255 and db.engine.dialect.name == 'postgresql':
+            logging.getLogger('helpdeskapp').warning(
+                'database.schema.expanding_password_column',
+                extra={'existing_length': password_length},
+            )
             connection.execute(
                 text('ALTER TABLE "user" ALTER COLUMN password TYPE VARCHAR(255)')
             )
