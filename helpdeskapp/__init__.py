@@ -97,7 +97,7 @@ def create_app(config=None):
     def handle_exception(error):
         if isinstance(error, HTTPException):
             logger.warning('request.http_error', exc_info=error)
-            raise error
+            return error
 
         logger.exception('request.unhandled_exception')
         return 'An unexpected error occurred. Please try again later.', 500

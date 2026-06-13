@@ -5,9 +5,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime, timedelta, timezone
 import re
+import logging
 
 MAX_LOGIN_ATTEMPTS = 3
 LOCKOUT_MINUTES = 15
+logger = logging.getLogger('helpdeskapp')
 
 
 def utc_now():
@@ -52,9 +54,11 @@ def login():
         user = User.query.filter_by(username=username).first()
         # Validation and authentication logic
         if not username or not password:
+            logger.warning('auth.login.missing_fields')
             flash('Username and password are required', category='danger')
             return render_template("login.html", user=current_user, entered_username=entered_username)
         if user and user.lockout_until and to_utc(user.lockout_until) > utc_now():
+            logger.warning('auth.login.locked_out')
             flash('Account locked after too many failed attempts. Try again later.', category='danger')
             return render_template("login.html", user=current_user, entered_username=entered_username)
 
@@ -63,6 +67,7 @@ def login():
                 user.failed_login_attempts = 0
                 user.lockout_until = None
                 db.session.commit()
+                logger.info('auth.login.success')
                 flash('Login successful', category='success')
                 login_user(user, remember=True)
                 return redirect(url_for('views.home'))
@@ -72,11 +77,14 @@ def login():
                     user.failed_login_attempts = 0
                     user.lockout_until = utc_now() + timedelta(minutes=LOCKOUT_MINUTES)
                     db.session.commit()
+                    logger.warning('auth.login.lockout_triggered')
                     flash('Account locked after too many failed attempts. Try again later.', category='danger')
                 else:
                     db.session.commit()
+                    logger.warning('auth.login.invalid_password')
                     flash('Invalid username or password', category='danger')
         else:
+            logger.warning('auth.login.unknown_username')
             flash('Invalid username or password', category='danger')
     return render_template("login.html", user=current_user, entered_username=entered_username)
 
@@ -94,6 +102,7 @@ def signup():
         # Form validation
         user = User.query.filter_by(username=username).first()
         if user:
+            logger.warning('auth.signup.duplicate_username')
             flash('Username already exists', category='danger')
         elif not username:
             flash('Username is required', category='danger')
@@ -113,6 +122,7 @@ def signup():
             if department_name:
                 selected_department = Department.query.filter_by(name=department_name).first()
                 if not selected_department:
+                    logger.warning('auth.signup.invalid_department')
                     flash('Selected department is invalid', category='danger')
                     return render_template("signup.html", user=current_user)
                 resolved_department_id = selected_department.id
@@ -131,6 +141,7 @@ def signup():
             )
             db.session.add(new_user)
             db.session.commit()
+            logger.info('auth.signup.success')
             login_user(new_user, remember=True)
             flash('Account created successfully', category='success')
             return redirect(url_for('views.home'))
@@ -140,6 +151,7 @@ def signup():
 @login_required
 def logout():
     # Logout route: logs out the current user
+    logger.info('auth.logout')
     logout_user()
     flash('You have been logged out', category='success')
     return redirect(url_for('auth.login'))

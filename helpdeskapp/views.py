@@ -3,9 +3,11 @@ from flask_login import login_required, current_user
 from .models import Ticket
 from . import db
 import json
+import logging
 
 # Blueprint for main application views
 views = Blueprint('views', __name__)
+logger = logging.getLogger('helpdeskapp')
 
 @views.route('/', methods=['GET', 'POST'])
 @login_required
@@ -43,6 +45,7 @@ def edit_ticket(ticket_id):
     # Edit ticket: Only Admin or the ticket owner can edit
     ticket = db.get_or_404(Ticket, ticket_id)
     if current_user.role != "Admin" and ticket.user_id != current_user.id:
+        logger.warning('ticket.edit.unauthorized')
         flash("You don't have permission to edit this ticket", "danger")
         return redirect(url_for('views.dashboard'))
     # Updating ticket fields
@@ -63,6 +66,7 @@ def edit_ticket(ticket_id):
                 ticket.priority = priority
                 ticket.status = status
             db.session.commit()
+            logger.info('ticket.edit.success')
             flash('Ticket updated successfully', 'success')
             return redirect(url_for('views.dashboard'))
     return render_template("edit_ticket.html", ticket=ticket)
@@ -83,6 +87,7 @@ def create_ticket_from_form(request):
     )
     db.session.add(new_ticket)
     db.session.commit()
+    logger.info('ticket.create.success')
     return True, 'Ticket added successfully'
 
 @views.route('/delete-ticket', methods=['POST'])
@@ -95,9 +100,11 @@ def delete_ticket():
     if ticket and (ticket.user_id == current_user.id or current_user.role == "Admin"):
         db.session.delete(ticket)
         db.session.commit()
+        logger.info('ticket.delete.success')
         flash('Ticket deleted successfully', 'success')
         return jsonify({'message': 'Ticket deleted successfully'}), 200
     else:
+        logger.warning('ticket.delete.unauthorized_or_missing')
         flash('Ticket not found or you do not have permission to delete this ticket', 'danger')
         return jsonify({'message': 'Ticket not found or you do not have permission to delete this ticket'}), 404
 
@@ -127,5 +134,6 @@ def guide_topic(guide_topic):
     elif guide_topic == 'create-new-tickets':
         return render_template(f'guide/{guide_topic}.html', guide_topic=guide_topic)
     else:
+        logger.warning('guide.access.denied_or_missing')
         flash('Guide not found', 'error')
         return redirect(url_for('views.guide_index'))
