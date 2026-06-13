@@ -1,0 +1,34 @@
+{% extends "base.html" %} {% block title %}Login{% endblock%}
+<!-- Login page: Authenticates users with their credentials -->
+
+{% block content %}
+<form method="POST">
+  <h3 align="center">Log in to the Help Desk App</h3>
+  <!-- Username field -->
+  <div class="form-group">
+    <label for="username">User Name</label>
+    <input
+      type="text"
+      class="form-control"
+      id="username"
+      name="username"
+      placeholder="Enter user name"
+      required
+    />
+  </div>
+  <!-- Password field -->
+  <div class="form-group">
+    <label for="password">Password</label>
+    <input
+      type="password"
+      class="form-control"
+      id="passwordLogin"
+      name="password"
+      placeholder="Enter password"
+      required
+    />
+  </div>
+  <br />
+  <button type="submit" class="btn btn-primary">Log in</button>
+</form>
+{% endblock %}
