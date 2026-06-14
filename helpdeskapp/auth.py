@@ -168,7 +168,7 @@ def signup():
         new_user = User(
             username=username,
             first_name=first_name,
-            password=generate_password_hash(password),
+                password=generate_password_hash(password, method="pbkdf2:sha256"),
             role=ROLE_USER,
             department_id=resolved_department_id,
         )

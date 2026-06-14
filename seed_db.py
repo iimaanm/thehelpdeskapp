@@ -47,7 +47,7 @@ def ensure_admin_user_exists():
     admin_user = User(
         username=admin_username,
         first_name=admin_first_name,
-        password=generate_password_hash(admin_password),
+        password=generate_password_hash(admin_password, method="pbkdf2:sha256"),
         role=ROLE_ADMIN,
         department_id=department.id,
     )
@@ -74,7 +74,7 @@ def seed_database():
         user = User(
             username=f"user{i}",
             first_name=f"User{i}",
-            password=generate_password_hash(default_seed_password),
+            password=generate_password_hash(default_seed_password, method="pbkdf2:sha256"),
             role=ROLE_USER,
             department_id=dept_by_name[dept_name].id
         )
@@ -86,7 +86,7 @@ def seed_database():
     admin_user = User(
         username=seeded_admin_username,
         first_name='Admin',
-        password=generate_password_hash(seeded_admin_password),
+        password=generate_password_hash(seeded_admin_password, method="pbkdf2:sha256"),
         role=ROLE_ADMIN,
         department_id=seeded_admin_department.id if seeded_admin_department else None,
     )

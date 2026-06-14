@@ -31,7 +31,7 @@ def user(app):
     user = User(
         username="test_helpdesk_user",
         first_name="Test",
-        password=generate_password_hash("password123"),
+        password=generate_password_hash("password123", method="pbkdf2:sha256"),
         role="User",
         department_id=department.id
     )
