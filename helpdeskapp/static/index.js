@@ -1,10 +1,14 @@
 // Function takes ticket id and sends a post request to the 'delete-ticket' endpoint to delete the ticket
 function deleteTicket(ticketId) {
     if (confirm('Are you sure you want to delete this ticket?')) {
+        const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : '';
+
         fetch('/delete-ticket', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
             },
             body: JSON.stringify({ ticketId: ticketId }),
         })

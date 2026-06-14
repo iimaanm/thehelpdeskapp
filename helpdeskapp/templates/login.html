@@ -3,6 +3,7 @@
 
 {% block content %}
 <form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
   <h3 align="center">Log in to the Help Desk App</h3>
   <!-- Username field -->
   <div class="form-group">

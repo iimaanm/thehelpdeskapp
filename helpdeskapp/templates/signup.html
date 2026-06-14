@@ -3,6 +3,7 @@
 {% block content %}
 <!-- Signup page: User registration form -->
 <form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
   <br />
   <h3 align="center">Sign up for the Help Desk App</h3>
   <!-- Username field -->

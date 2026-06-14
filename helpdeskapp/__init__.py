@@ -4,6 +4,7 @@ import logging
 import os
 import uuid
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFError, CSRFProtect
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.exc import SQLAlchemyError
 from datetime import timedelta
@@ -13,6 +14,7 @@ from .logging_config import configure_logging
 
 # Setting up the database instance for the app
 db = SQLAlchemy()
+csrf = CSRFProtect()
 DB_NAME = "database.db"
 
 
@@ -80,6 +82,9 @@ def create_app(config=None):
     if provided_config:
         app.config.update(provided_config)
 
+    # CSRF protection is enabled by default and only disabled in tests.
+    app.config.setdefault('WTF_CSRF_ENABLED', not app.config.get('TESTING', False))
+
     if app.config.get('APP_ENV') == 'production' and app.config.get('SECRET_KEY') == 'placeholder-secret-key':
         raise RuntimeError('SECRET_KEY must be set in production')
 
@@ -108,6 +113,7 @@ def create_app(config=None):
     app.config.setdefault('PERMANENT_SESSION_LIFETIME', timedelta(minutes=30))
 
     db.init_app(app)
+    csrf.init_app(app)
     
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
@@ -156,6 +162,11 @@ def create_app(config=None):
 
         logger.exception('request.unhandled_exception')
         return 'An unexpected error occurred. Please try again later.', 500
+
+    @app.errorhandler(CSRFError)
+    def handle_csrf_error(error):
+        logger.warning('request.csrf_rejected', extra={'csrf_error': error.description})
+        return 'CSRF validation failed. Please refresh and try again.', 400
     
     @login_manager.user_loader
     def load_user(id):
