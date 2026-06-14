@@ -1,4 +1,4 @@
-name: OWASP ZAP Scan
+name: OWASP ZAP Security Scan
 
 on:
   workflow_dispatch:
@@ -6,8 +6,12 @@ on:
 jobs:
   zap_scan:
     runs-on: ubuntu-latest
+
     steps:
-      - name: ZAP Baseline Scan
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: OWASP ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.12.0
         with:
           target: 'https://thehelpdeskapp.onrender.com'
