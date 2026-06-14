@@ -1,4 +1,5 @@
 from helpdeskapp import db
+from helpdeskapp.constants import ROLE_ADMIN, ROLE_USER, TICKET_PRIORITY_MEDIUM, TICKET_STATUS_OPEN
 from helpdeskapp.models import User, Ticket, Department
 from werkzeug.security import generate_password_hash
 import os
@@ -47,7 +48,7 @@ def ensure_admin_user_exists():
         username=admin_username,
         first_name=admin_first_name,
         password=generate_password_hash(admin_password),
-        role='Admin',
+        role=ROLE_ADMIN,
         department_id=department.id,
     )
     db.session.add(admin_user)
@@ -74,7 +75,7 @@ def seed_database():
             username=f"user{i}",
             first_name=f"User{i}",
             password=generate_password_hash(default_seed_password),
-            role="User",
+            role=ROLE_USER,
             department_id=dept_by_name[dept_name].id
         )
         db.session.add(user)
@@ -86,7 +87,7 @@ def seed_database():
         username=seeded_admin_username,
         first_name='Admin',
         password=generate_password_hash(seeded_admin_password),
-        role='Admin',
+        role=ROLE_ADMIN,
         department_id=seeded_admin_department.id if seeded_admin_department else None,
     )
     db.session.add(admin_user)
@@ -99,8 +100,8 @@ def seed_database():
             title=f"Test Ticket {i}",
             description=f"This is test ticket {i}.",
             user_id=users[i % len(users)].id,
-            status="Open",
-            priority="Medium"
+            status=TICKET_STATUS_OPEN,
+            priority=TICKET_PRIORITY_MEDIUM
         )
         db.session.add(ticket)
     db.session.commit()

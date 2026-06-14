@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from .models import User, Department
 from . import db
+from .constants import ROLE_USER
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime, timedelta, timezone
@@ -41,6 +42,23 @@ def validate_password_policy(password, username):
     if username and username.lower() in password.lower():
         return 'Password cannot contain your username'
     return None
+
+
+def validate_signup_fields(existing_user, username, password, password_confirm):
+    """Returns a (log_event, flash_message) tuple when base signup fields are invalid."""
+    checks = [
+        (existing_user is not None, 'auth.signup.duplicate_username', 'Username already exists'),
+        (not username, 'auth.signup.missing_username', 'Username is required'),
+        (bool(username) and len(username) < 6, 'auth.signup.short_username', 'Username must be at least 6 characters long'),
+        (not password, 'auth.signup.missing_password', 'Password is required'),
+        (bool(password) and len(password) < 12, 'auth.signup.short_password', 'Password must be at least 12 characters long'),
+        (not password_confirm, 'auth.signup.missing_password_confirmation', 'Password confirmation is required'),
+        (bool(password_confirm) and password != password_confirm, 'auth.signup.password_mismatch', 'Passwords must match'),
+    ]
+    for is_invalid, log_event, message in checks:
+        if is_invalid:
+            return log_event, message
+    return None, None
 
 auth = Blueprint('auth', __name__)
 
@@ -121,64 +139,48 @@ def signup():
 
         # Public signup only creates a normal user account.
         user = User.query.filter_by(username=username).first()
-        if user:
-            logger.warning('auth.signup.duplicate_username', extra={'attempted_username': username})
-            flash('Username already exists', category='danger')
-        elif not username:
-            logger.warning('auth.signup.missing_username')
-            flash('Username is required', category='danger')
-        elif len(username) < 6:
-            logger.warning('auth.signup.short_username', extra={'attempted_username': username})
-            flash('Username must be at least 6 characters long', category='danger')
-        elif not password:
-            logger.warning('auth.signup.missing_password', extra={'attempted_username': username})
-            flash('Password is required', category='danger')
-        elif len(password) < 12:
-            logger.warning('auth.signup.short_password', extra={'attempted_username': username})
-            flash('Password must be at least 12 characters long', category='danger')
-        elif not passwordConfirm:
-            logger.warning('auth.signup.missing_password_confirmation', extra={'attempted_username': username})
-            flash('Password confirmation is required', category='danger')
-        elif password != passwordConfirm:
-            logger.warning('auth.signup.password_mismatch', extra={'attempted_username': username})
-            flash('Passwords must match', category='danger')
-        else:
-            if department_name:
-                selected_department = Department.query.filter_by(name=department_name).first()
-                if not selected_department:
-                    logger.warning(
-                        'auth.signup.invalid_department',
-                        extra={'attempted_username': username, 'department_name': department_name},
-                    )
-                    flash('Selected department is invalid', category='danger')
-                    return render_template("signup.html", user=current_user)
-                resolved_department_id = selected_department.id
+        validation_event, validation_message = validate_signup_fields(user, username, password, passwordConfirm)
+        if validation_message:
+            logger.warning(validation_event, extra={'attempted_username': username or None})
+            flash(validation_message, category='danger')
+            return render_template("signup.html", user=current_user)
 
-            password_policy_error = validate_password_policy(password, username)
-            if password_policy_error:
+        if department_name:
+            selected_department = Department.query.filter_by(name=department_name).first()
+            if not selected_department:
                 logger.warning(
-                    'auth.signup.password_policy_rejected',
-                    extra={'attempted_username': username, 'policy_error': password_policy_error},
+                    'auth.signup.invalid_department',
+                    extra={'attempted_username': username, 'department_name': department_name},
                 )
-                flash(password_policy_error, category='danger')
+                flash('Selected department is invalid', category='danger')
                 return render_template("signup.html", user=current_user)
+            resolved_department_id = selected_department.id
 
-            new_user = User(
-                username=username,
-                first_name=first_name,
-                password=generate_password_hash(password),
-                role='User',
-                department_id=resolved_department_id,
+        password_policy_error = validate_password_policy(password, username)
+        if password_policy_error:
+            logger.warning(
+                'auth.signup.password_policy_rejected',
+                extra={'attempted_username': username, 'policy_error': password_policy_error},
             )
-            db.session.add(new_user)
-            db.session.commit()
-            logger.info(
-                'auth.signup.success',
-                extra={'created_user_id': new_user.id, 'department_id': resolved_department_id},
-            )
-            login_user(new_user, remember=True)
-            flash('Account created successfully', category='success')
-            return redirect(url_for('views.home'))
+            flash(password_policy_error, category='danger')
+            return render_template("signup.html", user=current_user)
+
+        new_user = User(
+            username=username,
+            first_name=first_name,
+            password=generate_password_hash(password),
+            role=ROLE_USER,
+            department_id=resolved_department_id,
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        logger.info(
+            'auth.signup.success',
+            extra={'created_user_id': new_user.id, 'department_id': resolved_department_id},
+        )
+        login_user(new_user, remember=True)
+        flash('Account created successfully', category='success')
+        return redirect(url_for('views.home'))
     return render_template("signup.html", user=current_user)
 
 @auth.route('/logout', methods=['GET'])

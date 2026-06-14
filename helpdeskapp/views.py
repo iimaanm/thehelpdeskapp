@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, flash, jsonify, redirect,
 from flask_login import login_required, current_user
 from .models import Ticket
 from . import db
+from .permissions import can_access_guide, can_delete_ticket, can_edit_ticket, is_admin
 import json
 import logging
 
@@ -33,7 +34,7 @@ def new_ticket():
 @login_required
 def dashboard():
     """Displays the tickets this user is allowed to view."""
-    if current_user.role == "Admin":
+    if is_admin(current_user):
         tickets = Ticket.query.order_by(Ticket.date.desc()).all()
     else:
         tickets = Ticket.query.filter_by(user_id=current_user.id).order_by(Ticket.date.desc()).all()
@@ -45,7 +46,7 @@ def dashboard():
 def edit_ticket(ticket_id):
     """Updates a ticket if the user is allowed to edit it."""
     ticket = db.get_or_404(Ticket, ticket_id)
-    if current_user.role != "Admin" and ticket.user_id != current_user.id:
+    if not can_edit_ticket(current_user, ticket):
         logger.warning(
             'ticket.edit.unauthorized',
             extra={'ticket_id': ticket.id, 'ticket_owner_id': ticket.user_id, 'role': current_user.role},
@@ -56,7 +57,7 @@ def edit_ticket(ticket_id):
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
-        if current_user.role == "Admin":
+        if is_admin(current_user):
             priority = request.form.get('priority')
             status = request.form.get('status')
         if len(title) < 5:
@@ -71,7 +72,7 @@ def edit_ticket(ticket_id):
         else:
             ticket.title = title
             ticket.description = description
-            if current_user.role == "Admin":
+            if is_admin(current_user):
                 ticket.priority = priority
                 ticket.status = status
             db.session.commit()
@@ -108,7 +109,7 @@ def delete_ticket():
     ticket = json.loads(request.data)
     ticketId = ticket['ticketId']
     ticket = db.session.get(Ticket, ticketId)
-    if ticket and (ticket.user_id == current_user.id or current_user.role == "Admin"):
+    if ticket and can_delete_ticket(current_user, ticket):
         db.session.delete(ticket)
         db.session.commit()
         logger.info('ticket.delete.success', extra={'ticket_id': ticketId, 'role': current_user.role})
@@ -133,24 +134,10 @@ def guide_index():
 def guide_topic(guide_topic):
     """Displays a guide page only if the user can access it."""
 
-    # Only allow guide names from these fixed lists.
-    admin_guides = [
-        'view-all-tickets', 'manage-user-requests', 'delete-tickets'
-    ]
-    user_guides = [
-        'track-your-tickets', 'update-existing-tickets'
-    ]
+    if can_access_guide(current_user, guide_topic):
+        logger.info('guide.access.granted', extra={'guide_topic': guide_topic, 'role': current_user.role})
+        return render_template(f'guide/{guide_topic}.html', guide_topic=guide_topic)
 
-    if current_user.role == "Admin" and guide_topic in admin_guides:
-        logger.info('guide.access.granted', extra={'guide_topic': guide_topic, 'role': current_user.role})
-        return render_template(f'guide/{guide_topic}.html', guide_topic=guide_topic)
-    elif current_user.role == "User" and guide_topic in user_guides:
-        logger.info('guide.access.granted', extra={'guide_topic': guide_topic, 'role': current_user.role})
-        return render_template(f'guide/{guide_topic}.html', guide_topic=guide_topic)
-    elif guide_topic == 'create-new-tickets':
-        logger.info('guide.access.granted', extra={'guide_topic': guide_topic, 'role': current_user.role})
-        return render_template(f'guide/{guide_topic}.html', guide_topic=guide_topic)
-    else:
-        logger.warning('guide.access.denied_or_missing', extra={'guide_topic': guide_topic, 'role': current_user.role})
-        flash('Guide not found', 'error')
-        return redirect(url_for('views.guide_index'))
+    logger.warning('guide.access.denied_or_missing', extra={'guide_topic': guide_topic, 'role': current_user.role})
+    flash('Guide not found', 'error')
+    return redirect(url_for('views.guide_index'))
