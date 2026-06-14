@@ -26,6 +26,7 @@
 </ul>
 <!-- Ticket creation form -->
   <form method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       <textarea name="title" class="form-control" id="title" placeholder="Enter a title (minimum 5 characters)" maxlength="100"></textarea>
       <br/>
       <textarea name="ticket" class="form-control" id="ticket" placeholder="Describe your issue (minimum 5 characters)"></textarea>

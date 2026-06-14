@@ -3,6 +3,7 @@
 
 {% block content %}
 <form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
   <h3 align="center">Log in to the Help Desk App</h3>
   <!-- Username field -->
   <div class="form-group">
@@ -12,9 +13,15 @@
       class="form-control"
       id="username"
       name="username"
+      value="{{ entered_username or '' }}"
       placeholder="Enter user name"
+      autocomplete="username"
       required
     />
+    <small class="form-text text-muted"
+      >For security, accounts will be temporarily locked after repeated failed
+      login attempts.</small
+    >
   </div>
   <!-- Password field -->
   <div class="form-group">
@@ -25,6 +32,7 @@
       id="passwordLogin"
       name="password"
       placeholder="Enter password"
+      autocomplete="current-password"
       required
     />
   </div>

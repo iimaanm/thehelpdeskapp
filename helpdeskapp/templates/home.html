@@ -83,6 +83,7 @@
             <div class="modal-body">
                 <!-- New Ticket form -->
                 <form method="POST" id="ticketForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <div class="form-group">
                         <label for="title">Title</label>
                         <input type="text" class="form-control" id="title" name="title" placeholder="Enter a title (minimum 5 characters)" required>

@@ -3,6 +3,7 @@
 {% block content %}
 <!-- Signup page: User registration form -->
 <form method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
   <br />
   <h3 align="center">Sign up for the Help Desk App</h3>
   <!-- Username field -->
@@ -35,8 +36,14 @@
       class="form-control"
       id="password"
       name="password"
+      minlength="12"
+      autocomplete="new-password"
       placeholder="Enter a password"
     />
+    <small class="form-text text-muted"
+      >Use 12+ characters with uppercase, lowercase, a number, and a special
+      character.</small
+    >
   </div>
   <div class="form-group">
     <label for="passwordConfirm">Password (Confirm)</label>
@@ -45,23 +52,16 @@
       class="form-control"
       id="passwordConfirm"
       name="passwordConfirm"
+      minlength="12"
+      autocomplete="new-password"
       placeholder="Confirm password"
     />
   </div>
-  <!-- Role selection -->
-  <div class="form-group">
-    <label for="role">Role</label>
-    <select class="custom-select" name="role" id="role">
-      <option value="" selected disabled>Select a Role</option>
-      <option value="User">User</option>
-      <option value="Admin">Admin</option>
-    </select>
-  </div>
   <!-- Department selection (optional) -->
   <div class="form-group">
-    <label for="department_id">Department ID (optional)</label>
-    <select class="custom-select" name="department_id" id="department_id">
-      <option value="" selected disabled>Select a Department Id</option>
+    <label for="department_name">Department (optional)</label>
+    <select class="custom-select" name="department_name" id="department_name">
+      <option value="" selected disabled>Select a Department</option>
       <option value="Consulting">Consulting</option>
       <option value="Business">Business</option>
       <option value="HR">HR</option>
@@ -71,6 +71,10 @@
       <option value="Resourcing">Resourcing</option>
     </select>
   </div>
+  <small class="form-text text-muted"
+    >New accounts are created as standard users. Admin access is assigned
+    separately.</small
+  >
   <br />
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
