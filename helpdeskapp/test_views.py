@@ -21,14 +21,14 @@ def app():
         user = User(
             username="testuser", 
             first_name="Testuser", 
-            password=generate_password_hash("password123"),
+                password=generate_password_hash("password123", method="pbkdf2:sha256"),
             role="User",
             department_id=dept.id
         )
         admin = User(
             username="testadmin", 
             first_name="Testadmin", 
-            password=generate_password_hash("password123"),
+                password=generate_password_hash("password123", method="pbkdf2:sha256"),
             role="Admin",
             department_id=dept.id
         )

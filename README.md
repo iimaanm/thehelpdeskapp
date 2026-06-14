@@ -28,7 +28,10 @@ The application follows MVC architecture:
 ## Setup Instructions
 1. Download the Zip File and open in your chosen IDE
 
-2. **Create and activate a virtual environment.**
+2. **Use Python 3.13 (or at least Python 3.10).**
+   The project and CI pipeline are aligned to Python 3.13.
+
+3. **Create and activate a virtual environment.**
    Run the following commands in the terminal:
 
    - **For macOS/Linux:**
@@ -43,12 +46,11 @@ The application follows MVC architecture:
      venv\Scripts\activate
      ```
 
-
-3. **Install dependencies:**
+4. **Install dependencies:**
    ```sh
    pip install -r requirements.txt
    ```
-4. **Create environment variables (recommended):**
+5. **Create environment variables (recommended):**
    ```sh
    export SECRET_KEY="replace-with-a-long-random-value"
    export APP_ENV="development"
@@ -56,17 +58,17 @@ The application follows MVC architecture:
    # Optional: use Neon/PostgreSQL locally instead of SQLite
    # export DATABASE_URL="postgresql://user:password@host/dbname?sslmode=require"
    ```
-5. **Run the application:**
+6. **Run the application:**
    ```sh
    python3 main.py
    ```
-6. **Seed data (development only).**
+7. **Seed data (development only).**
 Seeding is disabled by default unless `AUTO_SEED_DB=true` and the database is empty.
 If needed, run the following command in the terminal:
    ```sh
    python3 seed_db.py
    ```
-7. **Access the app:**
+8. **Access the app:**
    Open your browser and go to [http://localhost:5000](http://localhost:5000)
 
 ## Production Environment Variables (Render)
