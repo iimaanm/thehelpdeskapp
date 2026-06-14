@@ -1,5 +1,5 @@
 from . import db
-from .constants import ROLE_ADMIN, ROLE_USER, TICKET_PRIORITY_MEDIUM, TICKET_STATUS_OPEN
+from .constants import TICKET_PRIORITY_MEDIUM, TICKET_STATUS_OPEN
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 
