@@ -30,26 +30,56 @@ function deleteTicket(ticketId) {
 // Warning user if there are unsaved changes on a form
 let hasUnsavedChanges = false;
 
-// Mark form as having Unsaved Changes on input change
-window.addEventListener('DOMContentLoaded', function () {
-    const forms = document.querySelectorAll('form');
-    forms.forEach(form => {
-        // Skip form inside modals
-        if (form.closest('.modal')) return;
-        form.addEventListener('input', () => {
-            hasUnsavedChanges = true;
-        });
-        // On submit, reset hasUnsavedChanges flag and remove warning
-        form.addEventListener('submit', () => {
-            hasUnsavedChanges = false;
-            window.onbeforeunload = null;
-        });
-    });
-});
+function markUnsavedChanges() {
+    hasUnsavedChanges = true;
+}
 
-window.onbeforeunload = function (e) {
+function clearUnsavedChanges() {
+    hasUnsavedChanges = false;
+    window.onbeforeunload = null;
+}
+
+function handleBeforeUnload(e) {
     if (hasUnsavedChanges) {
         e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
         return 'You have unsaved changes. Are you sure you want to leave?';
     }
-};
+
+    return undefined;
+}
+
+function initializeUnsavedChangesWarning() {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        // Skip form inside modals
+        if (form.closest('.modal')) return;
+        form.addEventListener('input', markUnsavedChanges);
+        // On submit, reset hasUnsavedChanges flag and remove warning
+        form.addEventListener('submit', clearUnsavedChanges);
+    });
+
+    window.onbeforeunload = handleBeforeUnload;
+}
+
+// Mark form as having Unsaved Changes on input change
+window.addEventListener('DOMContentLoaded', function () {
+    initializeUnsavedChangesWarning();
+});
+
+window.deleteTicket = deleteTicket;
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        clearUnsavedChanges,
+        deleteTicket,
+        getHasUnsavedChanges: function () {
+            return hasUnsavedChanges;
+        },
+        handleBeforeUnload,
+        initializeUnsavedChangesWarning,
+        markUnsavedChanges,
+        setHasUnsavedChanges: function (value) {
+            hasUnsavedChanges = value;
+        },
+    };
+}
