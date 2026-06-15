@@ -133,7 +133,7 @@ def test_no_sqlite_fallback_when_database_available(monkeypatch):
     monkeypatch.setenv('DATABASE_URL', 'postgresql://user:pass@host/db')
     monkeypatch.setattr(helpdeskapp, 'can_connect_to_database', lambda _: True)
 
-    resolved_uri, used_fallback = helpdeskapp.resolve_database_uri('development', True)
+    resolved_uri, used_fallback = helpdeskapp.resolve_database_uri(True)
     assert resolved_uri == 'postgresql+psycopg://user:pass@host/db'
     assert used_fallback is False
 

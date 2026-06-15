@@ -43,7 +43,7 @@ def can_connect_to_database(database_url):
         return False
 
 
-def resolve_database_uri(app_env, allow_sqlite_fallback):
+def resolve_database_uri(allow_sqlite_fallback):
     fallback_uri = f'sqlite:///{DB_NAME}'
     database_url = normalize_database_url(os.getenv('DATABASE_URL', fallback_uri))
 
@@ -65,7 +65,6 @@ def create_app(config=None):
     app.config['APP_ENV'] = os.getenv('APP_ENV', 'development').lower()
     app.config['ALLOW_SQLITE_FALLBACK'] = parse_bool(os.getenv('ALLOW_SQLITE_FALLBACK'), default=True)
     resolved_database_url, using_sqlite_fallback = resolve_database_uri(
-        app.config['APP_ENV'],
         app.config['ALLOW_SQLITE_FALLBACK'],
     )
     app.config['SQLALCHEMY_DATABASE_URI'] = resolved_database_url
